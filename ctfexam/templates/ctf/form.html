@@ -1,0 +1,13 @@
+
+{% extends "base.html" %}
+
+{% block pagetitle %}{{ title }}– {{ block.super }}{% endblock %}
+
+
+{% block body %}
+    <h1> {{ title }} </h1>
+    <form>
+        {{ form }}
+    </form>
+
+{% endblock %}

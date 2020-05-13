@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "ctfexam"
+version = "0.1.0"
+description = "CTF environment which records how people did and lets them upload writeups"
+authors = ["Thom Wiggers <thom@thomwiggers.nl>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+django = "^3.0.6"
+
+[tool.poetry.dev-dependencies]
+flake8 = "*"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
