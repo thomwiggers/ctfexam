@@ -1,13 +1,22 @@
-
 {% extends "base.html" %}
+{% load bootstrap4 %}
+
 
 {% block pagetitle %}{{ title }}– {{ block.super }}{% endblock %}
 
 
 {% block body %}
+    {% bootstrap_messages %}
+
     <h1> {{ title }} </h1>
-    <form>
-        {{ form }}
+    <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">
+                Submit
+            </button>
+        {% endbuttons %}
     </form>
 
 {% endblock %}

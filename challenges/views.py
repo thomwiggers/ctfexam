@@ -1,0 +1,81 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from django.views.generic import TemplateView, DetailView, View
+from django.views.generic.edit import CreateView
+from django.shortcuts import render, get_object_or_404
+
+from typing import Dict
+
+
+from . import models
+
+
+class ChallengeListView(TemplateView):
+    """List of challenges"""
+
+    template_name = "challenges/challenge_list.html"
+
+    def _format_challenge(self, challenge: models.Challenge) -> Dict:
+        user = self.request.user
+        try:
+            user_entry = challenge.completed_entries.get(user=user)
+            finished = (user_entry.completion_time is not None
+                        and user_entry.writeup)
+        except models.ChallengeEntry.DoesNotExist:
+            user_entry = None
+            finished = False
+
+        return {
+            'obj': challenge,
+            'finished': finished,
+            'user_entry': 'user_entry',
+        }
+
+    def get_context_data(self, *args, **kwargs):
+        """Get the data necessary for the view"""
+        context = super().get_context_data(*args, **kwargs)
+        context['challenges'] = [
+            self._format_challenge(challenge)
+            for challenge in models.Challenge.objects.all()
+        ]
+
+        return context
+
+
+class ChallengeDetailView(LoginRequiredMixin, DetailView):
+    model = models.Challenge
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        try:
+            context['user_entry'] = entry = (
+                self.object.challengeentry_set.get(user=self.request.user))
+            context['processes'] = entry.challengeprocess_set.filter(running=True)
+        except models.ChallengeEntry.DoesNotExist:
+            context['user_entry'] = None
+        return context
+
+
+class ChallengeProcessCreateView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        challenge = get_object_or_404(models.Challenge, pk=pk)
+        entry, _new = models.ChallengeEntry.objects.get_or_create(
+            challenge=challenge,
+            user=request.user,
+        )
+        models.ChallengeProcess.start(entry)
+        return JsonResponse({
+            'started': True,
+        })
+
+
+class ChallengeProcessStopView(LoginRequiredMixin, View):
+    def post(self, _request, pk):
+        process = get_object_or_404(models.ChallengeProcess, pk=pk)
+        process.delete()
+        return JsonResponse({
+            'stopped': True,
+        })
+
+
+

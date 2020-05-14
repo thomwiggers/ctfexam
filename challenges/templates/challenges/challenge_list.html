@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block pagetitle %}Challenges {{ block.super }}{% endblock %}
+
+{% block body %}
+  <h1>Challenges</h1>
+  <ul>
+    {% for challenge in challenges %}
+      <div class="card">
+        <div class="card-header text-white {% if challenge.finished %}bg-secondary{% else %}bg-primary{% endif %}">
+          {{ challenge.obj.title }} {% if challenge.finished %}(Completed at {{ challenge.user_entry.completion_time }}){% endif %}
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{ challenge.obj.description|truncatewords_html:20|safe }}</p>
+          <a class="btn btn-primary" href="{{ challenge.obj.get_absolute_url }}">View challenge</a>
+        </div>
+        <div class="card-footer">
+          <ul>
+            {% with starters=challenge.obj.challengeentry_set.count %}
+              <li>Started by {{starters}} student{{ starters|pluralize }}</li>
+            {% endwith %}
+            {% with completed=challenge.obj.completed_entries.count %}
+              <li>Completed by {{completed}} student{{ completed|pluralize }}</li>
+            {% endwith %}
+          </ul>
+        </div>
+      </div>
+    {% endfor %}
+  </ul>
+{% endblock %}
+<!-- vim: set ft=jinja.html ts=4 sw=2 tw=0 et :-->

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static bootstrap4 %}
+
+{% block pagetitle %}{{ object.title }} – {{block.super}}{% endblock %}
+
+{% block body %}
+    <h1>{{ object.title }}</h1>
+    <p class="lead">{{ object.description|safe|linebreaks }}</p>
+
+    {% for process in processes %}
+        <div class="card">
+            <div class="card-header">
+                Running process
+            </div>
+            <div class="card-body">
+                Connection instructions
+                {% buttons %}
+                <button type="submit" class="btn btn-danger" id="stop-process-{{ process.pk }}">
+                    Stop process
+                </button>
+                {% endbuttons %}
+            </div>
+        </div>
+    {% empty %}
+    {% buttons %}
+    <button type="submit" class="btn btn-success" id="start-process">
+        Start assignment process
+    </button>
+    {% endbuttons %}
+    {% endfor %}
+
+    <div id="spinner-overlay" style="display:none;">
+        <div class="spinner"></div>
+        <br/>
+        Loading...
+    </div>
+{% endblock %}
+
+{% block js_head %}
+    {{ block.super }}
+    <script>
+        $(() => {
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            var csrftoken = getCookie('csrftoken');
+            function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+            $("#start-process").click((event) => {
+                $('#spinner-overlay').fadeIn();
+                $.ajax({
+                    "dataType": "json",
+                    "url": "{% url 'challenges:create_process' pk=challenge.pk %}",
+                    "method": "POST",
+                }).done((data, textStatus, jqXHR) => {
+                    console.log("Successfully started, reloading page");
+                    location.reload();
+                }).fail((data, textStatus, jqXHR) => {
+                    alert("Starting process failed");
+                    console.log(data, textStatus, jqXHR);
+                });
+            });
+            {% for process in processes %}
+            $("#stop-process-{{ process.pk }}").click((event) => {
+                $('#spinner-overlay').fadeIn();
+                $.ajax({
+                    "dataType": "json",
+                    "url": "{% url 'challenges:delete-process' pk=process.pk %}",
+                    "method": "POST",
+                }).done((data, textStatus, jqXHR) => {
+                    console.log("Successfully started, reloading page");
+                    location.reload();
+                }).fail((data, textStatus, jqXHR) => {
+                    alert("Stopping process failed");
+                    console.log(data, textStatus, jqXHR);
+                });
+            });
+            {% endfor %}
+        });
+    </script>
+{% endblock %}
+
+{% block css_head %}
+    {{ block.super }}
+    <link href="{% static 'css/spinner.css' %}" rel="stylesheet">
+{% endblock %}

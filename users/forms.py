@@ -6,4 +6,7 @@ class UserCreationForm(BaseUserCreationForm):
 
     class Meta(BaseUserCreationForm.Meta):
         model = models.User
-        fields = BaseUserCreationForm.Meta.fields + ('student_number',)
+        fields = [
+            'first_name', 'last_name', 'email', 'student_number',
+            'password1', 'password2',
+        ]

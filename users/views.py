@@ -1,13 +1,14 @@
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 
 from . import forms
 
+
 class UserRegistration(FormView):
-    template = 'ctf/form.html'
+    template_name = 'ctf/form.html'
     form_class = forms.UserCreationForm
-    success_url = 'index'
+    success_url = reverse_lazy('index')
 
     def form_valid(self, form):
         form.save()
