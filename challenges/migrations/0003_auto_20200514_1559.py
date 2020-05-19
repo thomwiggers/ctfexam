@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='challengeentry',
             name='flag',
-            field=models.CharField(default=challenges.models.random_flag, max_length=64),
+            field=models.CharField(default=lambda x: "", max_length=64),
         ),
         migrations.AlterField(
             model_name='challengeentry',

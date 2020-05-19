@@ -1,10 +1,18 @@
 """Models for the challenges"""
+from pathlib import Path
+import os
 import logging
+import random
 
 from django.dispatch import receiver
-from django.db import models
-from django.conf import settings
+from django.db import models, transaction
+from django.db.models import Q
+from django.conf import settings as django_settings
 from django.utils.crypto import get_random_string
+from django.utils.text import slugify
+from django.urls import reverse
+
+import docker
 
 
 #: Logger instance
@@ -20,24 +28,32 @@ class Challenge(models.Model):
 
     solution = models.TextField()
 
+    container = models.CharField(max_length=255)
+
     @property
     def completed_entries(self):
         """Return all completed entries of this challenge"""
         return self.challengeentry_set.filter(completion_time__isnull=False)
 
+    def get_absolute_url(self):
+        return reverse('challenges:challenge', kwargs={'pk': self.pk})
+
     def __str__(self):
         return self.title
 
 
-def random_flag():
-    """Return a random, 64-byte string
+def random_settings():
+    """Return randomized settings for the challenge
 
-    >>> len(random_flag())
-    64
-    >>> random_flag() != random_flag()
+    >>> random_settings()  # doctest: +ELLIPSIS
+    {'flag': ...
+    >>> random_settings() != random_settings()
     True
     """
-    return get_random_string(length=64),
+    return {
+        'flag': get_random_string(length=64),
+        'buffer_padding': random.randint(1, 75)
+    }
 
 
 class ChallengeEntry(models.Model):
@@ -49,13 +65,12 @@ class ChallengeEntry(models.Model):
     )
 
     #: The flag that completes this challenge
-    flag = models.CharField(
-        max_length=64,
-        default=random_flag,
+    settings = models.JSONField(
+        default=random_settings,
     )
 
     #: The user taking this challenge
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+    user = models.ForeignKey(django_settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
 
     #: When the challenge has been completed
@@ -67,8 +82,40 @@ class ChallengeEntry(models.Model):
         return f"{self.user} taking {self.challenge.title}"
 
 
+class AvailablePortsManager(models.Manager):
+    def get_queryset(self):
+        return (super()
+                .get_queryset()
+                .filter(
+                    Q(challengeprocess__running=True) |
+                    Q(challengeprocess__isnull=True)))
+
+class Port(models.Model):
+    """Manages available ports"""
+
+    objects = models.Manager()
+    available_ports = AvailablePortsManager()
+
+    port = models.PositiveSmallIntegerField(primary_key=True)
+
+    @classmethod
+    def get_new_port(cls):
+        return cls.available_ports.order_by('?').first()
+
+
+class ActiveChallengesManager(models.Manager):
+    """Gets only active challenges"""
+
+    def get_queryset(self):
+        """Filter on running instances"""
+        return super().get_queryset().filter(running=True)
+
+
 class ChallengeProcess(models.Model):
     """Manage a process started for a challenge"""
+
+    objects = models.Manager()
+    running_challenges = ActiveChallengesManager()
 
     challenge_entry = models.ForeignKey(
         "ChallengeEntry",
@@ -77,20 +124,117 @@ class ChallengeProcess(models.Model):
 
     running = models.BooleanField(default=False)
 
+    port = models.OneToOneField(Port, blank=True, null=True,
+                                on_delete=models.PROTECT)
+
+    process_identifier = models.TextField()
+
     @classmethod
+    def cleanup(cls):
+        """Remove all stale process handles"""
+        client = docker.DockerClient.from_env()
+        for process in cls.running_challenges.all():
+            dockerid = process.process_identifier
+            try:
+                client.containers.get(f'{dockerid}_vuln')
+            except docker.errors.NotFound:
+                process.running = False
+                process.save()
+
+    @classmethod
+    @transaction.atomic
     def start(cls, challenge_entry: ChallengeEntry):
         """Start the process"""
         logger.info("Starting process for %s",
                     challenge_entry.challenge.title)
-        cls.objects.create(challenge_entry=challenge_entry, running=True)
+
+        challenge = challenge_entry.challenge
+        dockerid = (f'{slugify(challenge.title)}'
+                    f'_{challenge_entry.user.username}'
+                    f'_{get_random_string(64)}')
+
+        logfile = (
+            django_settings.MEDIA_ROOT / 'logs' / dockerid / 'challenge.log'
+        )
+        os.makedirs(logfile)
+
+        client = docker.DockerClient.from_env()
+        client.networks.create(
+            f'{dockerid}_internal_network',
+            internal=True,
+        )
+        public = client.networks.create(
+            f'{dockerid}_public_network',
+        )
+        client.containers.run(
+            challenge.container,
+            name=f'{dockerid}_vuln',
+            detach=True,
+            auto_remove=True,
+            cpu_quota=5000,  # 5%
+            mem_limit='50m',
+            network=f'{dockerid}_internal_network',
+            stop_signal='SIGKILL',
+            user='1000',
+            privileged=True,
+            cap_drop=['ALL'],
+            environment={
+                key.upper(): value
+                for key, value in challenge_entry.settings.items()
+            },
+        )
+        port = Port.get_new_port()
+        proxy = client.containers.run(
+            'examproxy',
+            name=f'{dockerid}_proxy',
+            detach=True,
+            auto_remove=True,
+            cpu_quota=5000,  # 5%
+            mem_limit='50m',
+            network=f'{dockerid}_internal_network',
+            stop_signal='SIGKILL',
+            user='1000',
+            privileged=True,
+            cap_drop=['ALL'],
+            environment={
+                'VULNHOST': 'test_vuln',
+                'VULNPORT': '1337',
+            },
+            ports={
+                '4000': port.port,
+            },
+            volumes={
+                str(logfile): {'bind': '/log/log.log', 'mode': 'rw'},
+            },
+        )
+        public.connect(proxy)
+
+        cls.objects.create(
+            challenge_entry=challenge_entry,
+            process_identifier=dockerid,
+            port=port,
+            running=True)
     start.alters_data = True
 
     def stop(self):
         """Stop the process"""
         logger.info("Stopping process for %s",
                     self.challenge_entry.challenge.title)
+        client = docker.DockerClient.from_env()
+        dockerid = self.process_identifier
+
+        try:
+            for name in ['vuln', 'proxy']:
+                container = client.containers.get(f'{dockerid}_{name}')
+                container.stop(timeout=2)
+            for name in ['internal', 'public']:
+                network = client.networks.get(f'{dockerid}_{name}')
+                network.remove()
+        except docker.errors.NotFound:
+            pass
         self.running = False
         self.save()
+
     stop.alters_data = True
 
     def __str__(self):

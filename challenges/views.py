@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.views.generic import TemplateView, DetailView, View
 from django.views.generic.edit import CreateView
 from django.shortcuts import render, get_object_or_404
+from django.conf import settings
 
 from typing import Dict
 
@@ -50,9 +51,11 @@ class ChallengeDetailView(LoginRequiredMixin, DetailView):
         try:
             context['user_entry'] = entry = (
                 self.object.challengeentry_set.get(user=self.request.user))
-            context['processes'] = entry.challengeprocess_set.filter(running=True)
+            context['processes'] = (
+                entry.challengeprocess_set.filter(running=True))
         except models.ChallengeEntry.DoesNotExist:
             context['user_entry'] = None
+        context['docker_host'] = settings.DOCKER_HOST
         return context
 
 
@@ -70,12 +73,11 @@ class ChallengeProcessCreateView(LoginRequiredMixin, View):
 
 
 class ChallengeProcessStopView(LoginRequiredMixin, View):
-    def post(self, _request, pk):
-        process = get_object_or_404(models.ChallengeProcess, pk=pk)
+    def post(self, request, pk):
+        process = get_object_or_404(
+            models.ChallengeProcess,
+            pk=pk, user=request.user)
         process.delete()
         return JsonResponse({
             'stopped': True,
         })
-
-
-

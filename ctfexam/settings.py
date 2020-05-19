@@ -11,9 +11,14 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from pathlib import Path
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+# MEDIA root
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # Quick-start development settings - unsuitable for production
@@ -137,3 +142,5 @@ STATIC_URL = "/static/"
 LOGIN_REDIRECT_URL = "/"
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+DOCKER_HOST = 'localhost'
