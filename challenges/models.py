@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import logging
 import random
+import secrets
 
 from django.dispatch import receiver
 from django.db import models, transaction
@@ -81,10 +82,12 @@ class ChallengeEntry(models.Model):
 
     @property
     def flag(self):
-        return self.settings.get('flag')
+        return self.settings.get('flag', get_random_string(length=64))
 
     def submit_flag(self, flag):
-        if not self.flag == flag:
+        if flag is None:
+            return False
+        if secrets.compare_digest(self.flag, flag):
             self.completion_time = timezone.now()
             self.save()
             return True
@@ -101,6 +104,7 @@ class AvailablePortsManager(models.Manager):
                 .filter(
                     Q(challengeprocess__running=True) |
                     Q(challengeprocess__isnull=True)))
+
 
 class Port(models.Model):
     """Manages available ports"""
@@ -208,8 +212,6 @@ class ChallengeProcess(models.Model):
             mem_limit='50m',
             network=f'{dockerid}_public_network',
             stop_signal='SIGKILL',
-            user='1000',
-            privileged=True,
             cap_drop=['ALL'],
             environment={
                 'VULNHOST': 'vulnhost',
@@ -219,7 +221,7 @@ class ChallengeProcess(models.Model):
                 '4000': port.port,
             },
             volumes={
-                str(logfile): {'bind': '/log/log.log', 'mode': 'rw'},
+                str(logfile): {'bind': '/log/challenge.log', 'mode': 'rw'},
             },
         )
         internal.connect(proxy)
