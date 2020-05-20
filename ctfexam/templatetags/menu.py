@@ -10,6 +10,10 @@ MAIN_MENU: List[Dict[str, str]] = [
         'title': "Home",
         'name': 'index',
     },
+    {
+        "title": "Challenges",
+        'name': 'challenges:challenges',
+    },
 ]
 
 register = template.Library()
@@ -24,6 +28,7 @@ def render_main_menu(context: Dict):
         path = context['request'].path
 
     for item in MAIN_MENU:
-        item['active'] = "name" in item and reverse(item["name"]) == path
+        item['url'] = reverse(item["name"])
+        item['active'] = "name" in item and item['url'] == path
 
     return {"menu": MAIN_MENU, "request": context.get("request")}

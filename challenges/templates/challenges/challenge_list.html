@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load l10n %}
 
 {% block pagetitle %}Challenges {{ block.super }}{% endblock %}
 
@@ -8,7 +9,7 @@
     {% for challenge in challenges %}
       <div class="card">
         <div class="card-header text-white {% if challenge.finished %}bg-secondary{% else %}bg-primary{% endif %}">
-          {{ challenge.obj.title }} {% if challenge.finished %}(Completed at {{ challenge.user_entry.completion_time }}){% endif %}
+          {{ challenge.obj.title }} {% if challenge.finished %}(Completed at {{ challenge.user_entry.completion_time|date:"DATETIME_FORMAT" }}){% endif %}
         </div>
         <div class="card-body">
           <p class="card-text">{{ challenge.obj.description|truncatewords_html:20|safe }}</p>

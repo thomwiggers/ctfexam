@@ -7,16 +7,78 @@
     <h1>{{ object.title }}</h1>
     <p class="lead">{{ object.description|safe|linebreaks }}</p>
 
+
+    <div class="row">
+        <div class="card mb-4 w-100">
+            <div class="card-header">
+                Solve challenge
+            </div>
+            <div class="card-body">
+                {% if not user_entry.completion_time %}
+                <form id="flag-submit" method="POST" action="{% url 'challenges:submit_flag' pk=object.pk%}">
+                    {% csrf_token %}
+                    <div style="display: none;" class="alert" id="flag-response">
+                    </div>
+                    <div class="form-row align-items-center">
+                        <div class="col-4 mb-2">
+                                <label for="flag" class="sr-only">Password</label>
+                                <input type="text" class="form-control" id="flag" placeholder="CtFExam{...}">
+                        </div>
+                        <div class="col-auto my-1">
+                            <button type="submit" class="btn btn-success">
+                                Submit flag
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                {% else %}
+                <p>Completed at {{ user_entry.completion_time|date:"DATETIME_FORMAT" }}</p>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="card mb-4 w-100">
+            <div class="card-header">
+                Writeup
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="card" style="height: 100%">
+                            <div class="card-header">Markdown preview</div>
+                            <div class="card-body">
+                                <div id="writeup-preview">{{ writeup_html|safe }}</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm">
+                        <textarea id="writeup" class="form-control" style="height: 90%" placeholder="Enter your writeup here">{{ user_entry.writeup }}</textarea>
+                        <small class="form-text muted">
+                            Enter your writeup here.
+                            Supports <a href="https://daringfireball.net/projects/markdown/syntax" rel="nofollow">Markdown</a>.
+                            Saves and updates the preview two seconds after the last entry.
+                            <strong>Last saved:</strong> <span id="last-saved">haven't been changed yet</span>.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% for process in processes %}
-        <div class="card">
+    <div class="row">
+        <div class="card w-100 mb-2">
             <div class="card-header">
                 Running process
             </div>
             <div class="card-body">
                 Connect to this challenge on <code>{{ docker_host }}</code> on port {{ process.port.port }}, for example using the following commands:
-                <pre>
-                echo "Hello world!" | nc -N {{ docker_host }} {{ process.port.port }}
-                </pre>
+<pre>
+echo "Hello world" | nc -N {{ docker_host }} {{ process.port.port }}
+</pre>
                 {% buttons %}
                 <button type="submit" class="btn btn-danger" id="stop-process-{{ process.pk }}">
                     Stop process
@@ -24,12 +86,13 @@
                 {% endbuttons %}
             </div>
         </div>
+    </div>
     {% empty %}
-    {% buttons %}
-    <button type="submit" class="btn btn-success" id="start-process">
-        Start assignment process
-    </button>
-    {% endbuttons %}
+        {% buttons %}
+        <button type="submit" class="btn btn-success" id="start-process">
+            Start assignment process
+        </button>
+        {% endbuttons %}
     {% endfor %}
 
     <div id="spinner-overlay" style="display:none;">
@@ -58,6 +121,7 @@
                 }
                 return cookieValue;
             }
+
             var csrftoken = getCookie('csrftoken');
             function csrfSafeMethod(method) {
                 // these HTTP methods do not require CSRF protection
@@ -69,6 +133,28 @@
                         xhr.setRequestHeader("X-CSRFToken", csrftoken);
                     }
                 }
+            });
+            $('#flag-submit').submit((event) => {
+                $.ajax({
+                    "dataType": "json",
+                    "url": "{% url 'challenges:submit_flag' pk=object.pk %}",
+                    "method": "POST",
+                    "data": {
+                        "flag": $("#flag").val(),
+                    },
+                }).done((data, textStatus, jqXHR) => {
+                    console.log("Submitted flag is correct?", data.correct);
+                    $("#flag-response").removeClass("alert-success alert-danger");
+                    if (data.correct) {
+                        $("#flag-response").html("Correct!").addClass('alert-success').show();
+                    } else {
+                        $("#flag-response").html("Incorrect!").addClass('alert-danger').show();
+                    }
+                }).fail((data, textStatus, jqXHR) => {
+                    alert("Submitting flag failed");
+                    console.log(data, textStatus, jqXHR);
+                });
+                return false;
             });
             $("#start-process").click((event) => {
                 $('#spinner-overlay').fadeIn();
@@ -100,6 +186,32 @@
                 });
             });
             {% endfor %}
+
+
+            function saveForm() {
+                $.ajax({
+                    "dataType": "json",
+                    "url": "{% url 'challenges:submit_writeup' pk=object.pk %}",
+                    "method": "POST",
+                    "data": {
+                        "writeup": $("#writeup").val(),
+                    },
+                }).done((data, textStatus, jqXHR) => {
+                    console.log("Successfully saved writeup");
+                    $("#writeup-preview").html(data.preview_html);
+                    var now = new Date();
+                    $("#last-saved").html(now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds());
+                }).fail((data, textStatus, jqXHR) => {
+                    alert("Saving writeup failed. Copy your writeup into your clipboard and reload.");
+                });
+            };
+
+            // empty timeout as placeholder
+            var timer = setTimeout(() => {}, 1000000);
+            $("#writeup").keydown((event) => {
+                clearTimeout(timer);
+                timer = setTimeout(saveForm, 2000);
+            });
         });
     </script>
 {% endblock %}
@@ -107,4 +219,5 @@
 {% block css_head %}
     {{ block.super }}
     <link href="{% static 'css/spinner.css' %}" rel="stylesheet">
+    <link href="{% static 'css/highlight.css' %}" rel="stylesheet">
 {% endblock %}

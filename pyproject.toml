@@ -10,6 +10,9 @@ python = "^3.8"
 django = {version = "3.1a1", allow-prereleases = true}
 django-bootstrap4 = "^1.1.1"
 docker = "^4.2.0"
+bleach = "^3.1.5"
+Markdown = "^3.2.2"
+pygments = "^2.6.1"
 
 [tool.poetry.dev-dependencies]
 flake8 = "*"

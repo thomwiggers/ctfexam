@@ -8,7 +8,20 @@ from django.conf import settings
 from typing import Dict
 
 
+import markdown
+import bleach
+
+
 from . import models
+
+
+
+def markdownize(text):
+    return markdown.markdown(
+        text,
+        extensions=['extra', 'smarty', 'codehilite'],
+    )
+
 
 
 class ChallengeListView(TemplateView):
@@ -29,7 +42,7 @@ class ChallengeListView(TemplateView):
         return {
             'obj': challenge,
             'finished': finished,
-            'user_entry': 'user_entry',
+            'user_entry': user_entry,
         }
 
     def get_context_data(self, *args, **kwargs):
@@ -53,10 +66,38 @@ class ChallengeDetailView(LoginRequiredMixin, DetailView):
                 self.object.challengeentry_set.get(user=self.request.user))
             context['processes'] = (
                 entry.challengeprocess_set.filter(running=True))
+            context['writeup_html'] = markdownize(entry.writeup)
         except models.ChallengeEntry.DoesNotExist:
             context['user_entry'] = None
         context['docker_host'] = settings.DOCKER_HOST
         return context
+
+
+class SubmitFlag(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        challenge = get_object_or_404(models.Challenge, pk=pk)
+        entry, _new = models.ChallengeEntry.objects.get_or_create(
+            challenge=challenge,
+            user=request.user,
+        )
+        flag = request.POST.get('flag')
+        return JsonResponse({'correct': entry.submit_flag(flag)})
+
+
+class SubmitWriteup(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        challenge = get_object_or_404(models.Challenge, pk=pk)
+        entry, _new = models.ChallengeEntry.objects.get_or_create(
+            challenge=challenge,
+            user=request.user,
+        )
+        writeup = request.POST.get('writeup')
+        entry.writeup = writeup = bleach.clean(
+            writeup,
+            attributes=bleach.sanitizer.ALLOWED_ATTRIBUTES,
+            tags=bleach.sanitizer.ALLOWED_TAGS)
+        entry.save()
+        return JsonResponse({"preview_html": markdownize(writeup)})
 
 
 class ChallengeProcessCreateView(LoginRequiredMixin, View):
@@ -76,7 +117,7 @@ class ChallengeProcessStopView(LoginRequiredMixin, View):
     def post(self, request, pk):
         process = get_object_or_404(
             models.ChallengeProcess,
-            pk=pk, user=request.user)
+            pk=pk, challenge_entry__user=request.user)
         process.delete()
         return JsonResponse({
             'stopped': True,

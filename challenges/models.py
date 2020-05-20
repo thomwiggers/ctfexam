@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.conf import settings as django_settings
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
+from django.utils import timezone
 from django.urls import reverse
 
 import docker
@@ -78,6 +79,17 @@ class ChallengeEntry(models.Model):
 
     writeup = models.TextField(blank=True, null=True)
 
+    @property
+    def flag(self):
+        return self.settings.get('flag')
+
+    def submit_flag(self, flag):
+        if not self.flag == flag:
+            self.completion_time = timezone.now()
+            self.save()
+            return True
+        return False
+
     def __str__(self):
         return f"{self.user} taking {self.challenge.title}"
 
@@ -140,6 +152,7 @@ class ChallengeProcess(models.Model):
             except docker.errors.NotFound:
                 process.running = False
                 process.save()
+    cleanup.alters_data = True
 
     @classmethod
     @transaction.atomic
@@ -156,24 +169,26 @@ class ChallengeProcess(models.Model):
         logfile = (
             django_settings.MEDIA_ROOT / 'logs' / dockerid / 'challenge.log'
         )
-        os.makedirs(logfile)
+        logfile.parent.mkdir(parents=True)
+        logfile.touch()
 
         client = docker.DockerClient.from_env()
-        client.networks.create(
+        internal = client.networks.create(
             f'{dockerid}_internal_network',
             internal=True,
         )
-        public = client.networks.create(
+        client.networks.create(
             f'{dockerid}_public_network',
         )
-        client.containers.run(
+        vuln = client.containers.run(
             challenge.container,
             name=f'{dockerid}_vuln',
             detach=True,
             auto_remove=True,
             cpu_quota=5000,  # 5%
             mem_limit='50m',
-            network=f'{dockerid}_internal_network',
+            network_mode=None,
+            hostname='vulnhost',
             stop_signal='SIGKILL',
             user='1000',
             privileged=True,
@@ -191,13 +206,13 @@ class ChallengeProcess(models.Model):
             auto_remove=True,
             cpu_quota=5000,  # 5%
             mem_limit='50m',
-            network=f'{dockerid}_internal_network',
+            network=f'{dockerid}_public_network',
             stop_signal='SIGKILL',
             user='1000',
             privileged=True,
             cap_drop=['ALL'],
             environment={
-                'VULNHOST': 'test_vuln',
+                'VULNHOST': 'vulnhost',
                 'VULNPORT': '1337',
             },
             ports={
@@ -207,7 +222,8 @@ class ChallengeProcess(models.Model):
                 str(logfile): {'bind': '/log/log.log', 'mode': 'rw'},
             },
         )
-        public.connect(proxy)
+        internal.connect(proxy)
+        internal.connect(vuln, aliases=['vulnhost'])
 
         cls.objects.create(
             challenge_entry=challenge_entry,
@@ -228,13 +244,12 @@ class ChallengeProcess(models.Model):
                 container = client.containers.get(f'{dockerid}_{name}')
                 container.stop(timeout=2)
             for name in ['internal', 'public']:
-                network = client.networks.get(f'{dockerid}_{name}')
+                network = client.networks.get(f'{dockerid}_{name}_network')
                 network.remove()
         except docker.errors.NotFound:
-            pass
+            logger.exception("Couldn't finish cleanup")
         self.running = False
         self.save()
-
     stop.alters_data = True
 
     def __str__(self):

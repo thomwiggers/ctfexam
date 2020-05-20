@@ -7,7 +7,13 @@
     <h1> Welcome </h1>
     <p class="lead">
         This is the CTF site. The exam will take place on this platform.
-
+    </p>
+    <p>
+        {% if request.user.is_authenticated %}
+            You are logged in. Check out the challenges through the menu above.
+        {% else %}
         You can <a href="{% url 'users:register' %}">sign up here</a>.
+        {% endif %}
+
     </p>
 {% endblock %}
