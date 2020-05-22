@@ -195,6 +195,7 @@ class ChallengeProcess(models.Model):
             hostname='vulnhost',
             stop_signal='SIGKILL',
             user='1000',
+            pids_limit=5,
             privileged=True,
             cap_drop=['ALL'],
             environment={
@@ -210,6 +211,7 @@ class ChallengeProcess(models.Model):
             auto_remove=True,
             cpu_quota=5000,  # 5%
             mem_limit='50m',
+            pids_limit=5,
             network=f'{dockerid}_public_network',
             stop_signal='SIGKILL',
             cap_drop=['ALL'],
