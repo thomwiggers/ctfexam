@@ -194,7 +194,6 @@ class ChallengeProcess(models.Model):
             network_mode=None,
             hostname='vulnhost',
             stop_signal='SIGKILL',
-            user='1000',
             pids_limit=5,
             privileged=True,
             cap_drop=['ALL'],
