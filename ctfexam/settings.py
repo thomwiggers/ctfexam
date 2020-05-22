@@ -25,7 +25,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "!lw0!5e%=#yc!+lat*d)6z9e7_f5-n=-vxh!)qtd97445e8*%c"
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "!lw0!5e%=#yc!+lat*d)6z9e7_f5-n=-vxh!)qtd97445e8*%c")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -144,3 +146,9 @@ LOGIN_REDIRECT_URL = "/"
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DOCKER_HOST = 'localhost'
+
+
+try:
+    from .production_settings import *
+except ImportError:
+    pass
