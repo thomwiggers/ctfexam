@@ -17,10 +17,12 @@ from . import models
 
 
 def markdownize(text):
-    return markdown.markdown(
-        text,
-        extensions=['extra', 'smarty', 'codehilite'],
-    )
+    if text is not None:
+        return markdown.markdown(
+            text,
+            extensions=['extra', 'smarty', 'codehilite'],
+        )
+    return ''
 
 
 
