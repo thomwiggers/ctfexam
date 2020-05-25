@@ -177,6 +177,10 @@ class ChallengeProcess(models.Model):
         logfile.touch()
 
         client = docker.DockerClient.from_env()
+        client.images.pull(django_settings.PROXY_CONTAINER, tag='latest')
+        challenge_container = (
+            f"{django_settings.CONTAINER_NAMESPACE}/{challenge.container}")
+        client.images.pull(challenge_container, tag='latest')
         internal = client.networks.create(
             f'{dockerid}_internal_network',
             internal=True,
@@ -185,7 +189,7 @@ class ChallengeProcess(models.Model):
             f'{dockerid}_public_network',
         )
         vuln = client.containers.run(
-            challenge.container,
+            challenge_container,
             name=f'{dockerid}_vuln',
             detach=True,
             auto_remove=True,
@@ -204,7 +208,7 @@ class ChallengeProcess(models.Model):
         )
         port = Port.get_new_port()
         proxy = client.containers.run(
-            'examproxy',
+            django_settings.PROXY_CONTAINER,
             name=f'{dockerid}_proxy',
             detach=True,
             auto_remove=True,

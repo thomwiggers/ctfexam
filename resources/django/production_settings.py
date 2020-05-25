@@ -26,6 +26,7 @@ from students import VALID_STUDENT_NUMBERS
 SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+SERVER_EMAIL = 'noreply@hackme.rded.nl'
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = 'apikey'      # this is exactly the value 'apikey'

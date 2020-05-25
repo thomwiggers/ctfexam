@@ -146,6 +146,8 @@ LOGIN_REDIRECT_URL = "/"
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DOCKER_HOST = 'localhost'
+CONTAINER_NAMESPACE = 'eu.gcr.io/hacking-in-c/'
+PROXY_CONTAINER = 'eu.gcr.io/hacking-in-c/exam-proxy'
 
 
 VALID_STUDENT_NUMBERS = None
