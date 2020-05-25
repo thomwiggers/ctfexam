@@ -53,7 +53,7 @@ def random_settings():
     True
     """
     return {
-        'flag': get_random_string(length=64),
+        'flag': f"HiCCTF{{{get_random_string(length=64)}}}",
         'buffer_padding': random.randint(1, 75)
     }
 
@@ -168,13 +168,10 @@ class ChallengeProcess(models.Model):
         challenge = challenge_entry.challenge
         dockerid = (f'{slugify(challenge.title)}'
                     f'_{challenge_entry.user.username}'
-                    f'_{get_random_string(64)}')
+                    f'_{get_random_string(32)}')
 
-        logfile = (
-            django_settings.MEDIA_ROOT / 'logs' / dockerid / 'challenge.log'
-        )
-        logfile.parent.mkdir(parents=True)
-        logfile.touch()
+        logdir = django_settings.MEDIA_ROOT / 'logs' / dockerid
+        logdir.mkdir(parents=True)
 
         client = docker.DockerClient.from_env()
         client.images.pull(django_settings.PROXY_CONTAINER, tag='latest')
@@ -214,10 +211,10 @@ class ChallengeProcess(models.Model):
             auto_remove=True,
             cpu_quota=5000,  # 5%
             mem_limit='50m',
-            pids_limit=5,
             network=f'{dockerid}_public_network',
             stop_signal='SIGKILL',
             cap_drop=['ALL'],
+            cap_add=['CHOWN'],
             environment={
                 'VULNHOST': 'vulnhost',
                 'VULNPORT': '1337',
@@ -226,7 +223,7 @@ class ChallengeProcess(models.Model):
                 '4000': port.port,
             },
             volumes={
-                str(logfile): {'bind': '/log/challenge.log', 'mode': 'rw'},
+                str(logdir): {'bind': '/log/', 'mode': 'rw'},
             },
         )
         internal.connect(proxy)
