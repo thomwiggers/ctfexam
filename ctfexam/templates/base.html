@@ -29,13 +29,20 @@
 
   <body>
       <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-          <a class="navbar-brand" href="#">Navbar</a>
+          <span class="navbar-brand">Hacking in C(TF)</span>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menuNavigation" aria-controls="menuNavigation" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
           </button>
 
           <div class="collapse navbar-collapse" id="menuNavigation">
-            {% render_main_menu %}
+              {% render_main_menu %}
+              <span class="navbar-text">
+                {% if not user.is_anonymous %}
+                  {{ user.username }}
+                {% else %}
+                  <a href="{% url 'login' %}">Login</a>
+                {% endif %}
+              </span>
           </div>
       </nav>
 
