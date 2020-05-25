@@ -1,0 +1,30 @@
+[Unit]
+Description=Generated timer for hackme-cleanup by /home/thom/.local/bin/generate-systemd-timer
+
+[Timer]
+#Unit=hackme-cleanup.service
+
+# Select one of the following
+OnCalendar=0:*/15
+#OnActiveSec=         # Time after this timer has been loaded
+OnBootSec=60
+#OnStartupSec=        # Time relative to systemd manager start; relevant for user login
+#OnUnitActiveSec=     # Defines it relative to when the to-be-started unit was last activated
+#OnUnitInactiveSec=   # Defines it relative to when the to-be-started unit was last deactivated
+
+# Optional settings
+#AccuracySec=1m          # Defines the accuracy with which this timer shall elapse
+RandomizedDelaySec=120
+#Persistent=false        # Also activate if the timer expired while timer was inactive
+                         # Only relevant for OnCalendar
+
+# Probably not necessary
+#OnClockChange=false     # Activate this unit whenever the clock jumps
+#OnTimezoneChange=false  # Activate whenever the timezone changes
+#WAkeSystem=false        # Resume the system from suspend to activate (if supported)
+#RemainAfterElapse=true  # Keeps the timer in the service manager once elapsed.
+
+[Install]
+WantedBy=timers.target
+
+# vim : set ft=systemd.timer :

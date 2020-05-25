@@ -1,0 +1,20 @@
+[Unit]
+Description=uWSGI Django for ctfexam
+After=syslog.target
+
+[Service]
+ExecStart=/usr/local/bin/uwsgi --ini /home/django/django.ini
+# Requires systemd version 211 or newer
+RuntimeDirectory=uwsgi
+Restart=on-failure
+User=django
+Group=www-data
+SupplementaryGroups=docker
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
+

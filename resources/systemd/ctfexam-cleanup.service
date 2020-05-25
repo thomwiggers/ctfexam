@@ -1,0 +1,6 @@
+[Unit]
+Description=Run janitor jobs for ctfexam
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/django/ctfexam/manage.py cleanup_processes
