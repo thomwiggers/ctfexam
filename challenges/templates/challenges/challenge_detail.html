@@ -5,7 +5,13 @@
 
 {% block body %}
     <h1>{{ object.title }}</h1>
-    <p class="lead">{{ object.description|safe|linebreaks }}</p>
+    <div class="row">
+        <div class="card mb-4 w-100">
+            <div class="card-body">
+                {{ description|safe}}
+            </div>
+        </div>
+    </div>
 
 
     <div class="row">
@@ -90,7 +96,7 @@ echo "Hello world" | nc -N {{ docker_host }} {{ process.port.port }}
     {% empty %}
         {% buttons %}
         <button type="submit" class="btn btn-success" id="start-process">
-            Start assignment process
+            Launch challenge service
         </button>
         {% endbuttons %}
     {% endfor %}

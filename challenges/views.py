@@ -76,6 +76,7 @@ class ChallengeDetailView(LoginRequiredMixin, DetailView):
         except models.ChallengeEntry.DoesNotExist:
             context['user_entry'] = None
         context['docker_host'] = settings.DOCKER_HOST
+        context['description'] = markdownize(self.object.description)
         return context
 
 
