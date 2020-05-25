@@ -14,6 +14,8 @@ ALLOWED_HOSTS = [
     'hackme.rded.nl',
 ]
 
+DJANGO_HOST = 'hackme.rded.nl'
+
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
@@ -27,6 +29,7 @@ SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 SERVER_EMAIL = 'noreply@hackme.rded.nl'
+DEFAULT_FROM_EMAIL = 'noreply@hackme.rded.nl'
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = 'apikey'      # this is exactly the value 'apikey'

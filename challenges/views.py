@@ -34,9 +34,13 @@ class ChallengeListView(TemplateView):
     def _format_challenge(self, challenge: models.Challenge) -> Dict:
         user = self.request.user
         try:
-            user_entry = challenge.completed_entries.get(user=user)
-            finished = (user_entry.completion_time is not None
-                        and user_entry.writeup)
+            if not user.is_anonymous:
+                user_entry = challenge.completed_entries.get(user=user)
+                finished = (user_entry.completion_time is not None
+                            and user_entry.writeup)
+            else:
+                user_entry = None
+                finished = None
         except models.ChallengeEntry.DoesNotExist:
             user_entry = None
             finished = False
