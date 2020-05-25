@@ -213,7 +213,6 @@ class ChallengeProcess(models.Model):
             mem_limit='50m',
             network=f'{dockerid}_public_network',
             stop_signal='SIGKILL',
-            cap_drop=['ALL'],
             cap_add=['CHOWN'],
             environment={
                 'VULNHOST': 'vulnhost',
