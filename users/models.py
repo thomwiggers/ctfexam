@@ -7,7 +7,7 @@ from django.conf import settings
 
 
 def validate_student_number(student_number):
-    if (numbers := settings.get('VALID_STUDENT_NUMBERS')) is not None:
+    if (numbers := settings.VALID_STUDENT_NUMBERS) is not None:
         if student_number not in numbers:
             raise ValidationError("This is not a known student number")
 

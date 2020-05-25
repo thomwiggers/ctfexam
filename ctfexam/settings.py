@@ -148,6 +148,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DOCKER_HOST = 'localhost'
 
 
+VALID_STUDENT_NUMBERS = None
+
+
 try:
     from .production_settings import *
 except ImportError:
