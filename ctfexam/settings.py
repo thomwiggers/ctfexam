@@ -150,12 +150,6 @@ DOCKER_HOST = 'localhost'
 
 VALID_STUDENT_NUMBERS = None
 
-
-try:
-    from .production_settings import *
-except ImportError:
-    pass
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -189,11 +183,17 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'file': {
+            'level': 'INFO',
+            'filters': ['require_debug_false'],
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'django.log',
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'mail_admins'],
+            'handlers': ['console', 'mail_admins', 'file'],
             'level': 'INFO',
         },
         'django.server': {
@@ -202,12 +202,17 @@ LOGGING = {
             'propagate': False,
         },
         'ctfexam': {
-            'handlers': ['console', 'mail_admins'],
+            'handlers': ['console', 'mail_admins', 'file'],
             'level': 'INFO',
         },
         'challenges': {
-            'handlers': ['console', 'mail_admins'],
+            'handlers': ['console', 'mail_admins', 'file'],
             'level': 'INFO',
         },
     }
 }
+
+try:
+    from .production_settings import *
+except ImportError:
+    pass
