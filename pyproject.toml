@@ -13,6 +13,7 @@ docker = "^4.2.0"
 bleach = "^3.1.5"
 Markdown = "^3.2.2"
 pygments = "^2.6.1"
+sentry-sdk = "^0.14.4"
 
 [tool.poetry.dev-dependencies]
 flake8 = "*"
