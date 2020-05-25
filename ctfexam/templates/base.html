@@ -39,6 +39,9 @@
               <span class="navbar-text">
                 {% if not user.is_anonymous %}
                   {{ user.username }}
+                  {% if user.is_staff %}
+                    <a href="/admin/">(Admin)</a>
+                  {% endif %}
                 {% else %}
                   <a href="{% url 'login' %}">Login</a>
                 {% endif %}

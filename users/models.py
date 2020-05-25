@@ -8,7 +8,7 @@ from django.conf import settings
 
 def validate_student_number(student_number):
     if (numbers := settings.VALID_STUDENT_NUMBERS) is not None:
-        if student_number not in numbers:
+        if student_number.lower() not in numbers:
             raise ValidationError("This is not a known student number")
 
 
@@ -30,3 +30,7 @@ class User(AbstractUser):
             validate_student_number,
         ],
     )
+
+    def save(self, *args, **kwargs):
+        self.student_number = self.student_number.lower()
+        return super().save(*args, **kwargs)
