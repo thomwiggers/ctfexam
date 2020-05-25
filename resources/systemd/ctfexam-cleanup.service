@@ -3,4 +3,5 @@ Description=Run janitor jobs for ctfexam
 
 [Service]
 Type=oneshot
+Environment="SECRET_KEY=placeholder"
 ExecStart=/usr/bin/python3 /home/django/ctfexam/manage.py cleanup_processes

@@ -5,7 +5,7 @@ Description=Generated timer for hackme-cleanup by /home/thom/.local/bin/generate
 #Unit=hackme-cleanup.service
 
 # Select one of the following
-OnCalendar=0:*/15
+OnCalendar=*:0/15
 #OnActiveSec=         # Time after this timer has been loaded
 OnBootSec=60
 #OnStartupSec=        # Time relative to systemd manager start; relevant for user login
