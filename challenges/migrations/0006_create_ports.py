@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('challenges', '0005_auto_20200519_1517'),
+        ('challenges', '0009_auto_20200526_1010'),
     ]
 
     operations = [

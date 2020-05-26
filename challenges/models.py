@@ -112,7 +112,7 @@ class Port(models.Model):
     objects = models.Manager()
     available_ports = AvailablePortsManager()
 
-    port = models.PositiveSmallIntegerField(primary_key=True)
+    port = models.PositiveIntegerField(primary_key=True)
 
     @classmethod
     def get_new_port(cls):

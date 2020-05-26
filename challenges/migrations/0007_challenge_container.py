@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('challenges', '0006_create_ports'),
+        ('challenges', '0005_auto_20200519_1517'),
     ]
 
     operations = [
