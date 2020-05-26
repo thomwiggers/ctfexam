@@ -166,7 +166,7 @@ class ChallengeProcess(models.Model):
 
         challenge = challenge_entry.challenge
         dockerid = (f'{slugify(challenge.title)}'
-                    f'_{challenge_entry.user.username}'
+                    f'_{slugify(challenge_entry.user.username)}'
                     f'_{get_random_string(32)}')
 
         logdir = django_settings.MEDIA_ROOT / 'logs' / dockerid
