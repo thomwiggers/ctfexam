@@ -83,7 +83,7 @@
             <div class="card-body">
                 Connect to this challenge on <code>{{ docker_host }}</code> on port {{ process.port.port }}, for example using the following commands:
 <pre>
-echo "Hello world" | nc -N {{ docker_host }} {{ process.port.port }}
+echo "Hello world" | nc {{ docker_host }} {{ process.port.port }}
 </pre>
                 {% buttons %}
                 <button type="submit" class="btn btn-danger" id="stop-process-{{ process.pk }}">

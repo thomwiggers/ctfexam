@@ -159,7 +159,6 @@ class ChallengeProcess(models.Model):
     cleanup.alters_data = True
 
     @classmethod
-    @transaction.atomic
     def start(cls, challenge_entry: ChallengeEntry):
         """Start the process"""
         logger.info("Starting process for %s",
@@ -203,36 +202,37 @@ class ChallengeProcess(models.Model):
                 for key, value in challenge_entry.settings.items()
             },
         )
-        port = Port.get_new_port()
-        proxy = client.containers.run(
-            django_settings.PROXY_CONTAINER,
-            name=f'{dockerid}_proxy',
-            detach=True,
-            auto_remove=True,
-            cpu_quota=5000,  # 5%
-            mem_limit='50m',
-            network=f'{dockerid}_public_network',
-            stop_signal='SIGKILL',
-            cap_add=['CHOWN'],
-            environment={
-                'VULNHOST': 'vulnhost',
-                'VULNPORT': '1337',
-            },
-            ports={
-                '4000': port.port,
-            },
-            volumes={
-                str(logdir): {'bind': '/log/', 'mode': 'rw'},
-            },
-        )
-        internal.connect(proxy)
-        internal.connect(vuln, aliases=['vulnhost'])
+        with transaction.atomic():
+            port = Port.get_new_port()
+            proxy = client.containers.run(
+                django_settings.PROXY_CONTAINER,
+                name=f'{dockerid}_proxy',
+                detach=True,
+                auto_remove=True,
+                cpu_quota=5000,  # 5%
+                mem_limit='50m',
+                network=f'{dockerid}_public_network',
+                stop_signal='SIGKILL',
+                cap_add=['CHOWN'],
+                environment={
+                    'VULNHOST': 'vulnhost',
+                    'VULNPORT': '1337',
+                },
+                ports={
+                    '4000': port.port,
+                },
+                volumes={
+                    str(logdir): {'bind': '/log/', 'mode': 'rw'},
+                },
+            )
+            internal.connect(proxy)
+            internal.connect(vuln, aliases=['vulnhost'])
 
-        cls.objects.create(
-            challenge_entry=challenge_entry,
-            process_identifier=dockerid,
-            port=port,
-            running=True)
+            cls.objects.create(
+                challenge_entry=challenge_entry,
+                process_identifier=dockerid,
+                port=port,
+                running=True)
     start.alters_data = True
 
     def stop(self):
