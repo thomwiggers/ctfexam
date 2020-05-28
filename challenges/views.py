@@ -1,12 +1,12 @@
+from html import unescape
+from typing import Dict
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.views.generic import TemplateView, DetailView, View
 from django.views.generic.edit import CreateView
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
-
-from typing import Dict
-
 
 import markdown
 import bleach
@@ -99,10 +99,14 @@ class SubmitWriteup(LoginRequiredMixin, View):
             user=request.user,
         )
         writeup = request.POST.get('writeup')
-        entry.writeup = writeup = bleach.clean(
+        if writeup is None:
+            return JsonResponse({"error": "no writeup included"}, status=400)
+        entry.writeup = writeup = unescape(bleach.clean(
             writeup,
             attributes=bleach.sanitizer.ALLOWED_ATTRIBUTES,
-            tags=bleach.sanitizer.ALLOWED_TAGS)
+            tags=bleach.sanitizer.ALLOWED_TAGS,
+            strip=True,
+        ))
         entry.save()
         return JsonResponse({"preview_html": markdownize(writeup)})
 

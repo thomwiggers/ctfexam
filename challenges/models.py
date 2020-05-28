@@ -1,10 +1,9 @@
 """Models for the challenges"""
-from pathlib import Path
-import os
 import logging
 import random
 import secrets
 
+import docker
 from django.dispatch import receiver
 from django.db import models, transaction
 from django.db.models import Q
@@ -13,8 +12,6 @@ from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils import timezone
 from django.urls import reverse
-
-import docker
 
 
 #: Logger instance
