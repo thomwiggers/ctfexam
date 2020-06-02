@@ -14,21 +14,19 @@ def validate_student_number(student_number):
 
 class User(AbstractUser):
     REQUIRED_FIELDS = [
-        'first_name',
-        'last_name',
-        'email',
-        'student_number',
+        "first_name",
+        "last_name",
+        "email",
+        "student_number",
     ]
 
     student_number = models.CharField(
-        'student number',
+        "student number",
         max_length=8,
         blank=False,
         null=False,
         unique=True,
-        validators=[
-            validate_student_number,
-        ],
+        validators=[validate_student_number,],
     )
 
     def save(self, *args, **kwargs):

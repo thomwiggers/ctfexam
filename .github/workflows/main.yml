@@ -1,0 +1,49 @@
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade poetry
+          poetry install --no-interaction
+
+      - name: Run the Django tests
+        run: poetry run ./manage.py test
+
+      - name: Test the templates
+        run: poetry run python ./manage.py templatecheck --project-only
+
+      - name: Make migrations
+        run: poetry run python ./manage.py makemigrations --no-input --check --dry-run
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade poetry
+          poetry install --no-interaction
+
+      - name: black
+        run: poetry run black --quiet --check .
+
+
+# vim: set ft=yaml ts=2 sw=2 tw=0 et :

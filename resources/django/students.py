@@ -1,3 +1,3 @@
 VALID_STUDENT_NUMBERS = [
-    's4119444',
+    "s4119444",
 ]

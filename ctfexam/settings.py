@@ -18,7 +18,7 @@ BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # MEDIA root
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / "media"
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,8 +26,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get(
-    "SECRET_KEY",
-    "!lw0!5e%=#yc!+lat*d)6z9e7_f5-n=-vxh!)qtd97445e8*%c")
+    "SECRET_KEY", "!lw0!5e%=#yc!+lat*d)6z9e7_f5-n=-vxh!)qtd97445e8*%c"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -90,9 +90,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-        "OPTIONS": {
-            "timeout": 20,
-        },
+        "OPTIONS": {"timeout": 20,},
     }
 }
 
@@ -106,22 +104,17 @@ AUTH_USER_MODEL = "users.User"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": ("django.contrib.auth.password_validation"
-                 ".UserAttributeSimilarityValidator"),
+        "NAME": (
+            "django.contrib.auth.password_validation"
+            ".UserAttributeSimilarityValidator"
+        ),
     },
     {
-        "NAME":
-            "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {'min_length': 12},
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 12},
     },
-    {
-        "NAME":
-            "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME":
-            "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
 
 
@@ -146,75 +139,65 @@ STATIC_URL = "/static/"
 
 LOGIN_REDIRECT_URL = "/"
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-DOCKER_HOST = 'localhost'
-CONTAINER_NAMESPACE = 'eu.gcr.io/hacking-in-c'
-PROXY_CONTAINER = 'eu.gcr.io/hacking-in-c/exam-proxy'
+DOCKER_HOST = "localhost"
+CONTAINER_NAMESPACE = "eu.gcr.io/hacking-in-c"
+PROXY_CONTAINER = "eu.gcr.io/hacking-in-c/exam-proxy"
 
 
 VALID_STUDENT_NUMBERS = None
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        },
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
+    "version": 1,
+    "disable_existing_loggers": True,
+    "filters": {
+        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse",},
+        "require_debug_true": {"()": "django.utils.log.RequireDebugTrue",},
     },
-    'formatters': {
-        'django.server': {
-            '()': 'django.utils.log.ServerFormatter',
-            'format': '[{server_time}] {message}',
-            'style': '{',
+    "formatters": {
+        "django.server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "[{server_time}] {message}",
+            "style": "{",
         }
     },
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
         },
-        'django.server': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'django.server',
+        "django.server": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "django.server",
         },
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
         },
-        'file': {
-            'level': 'INFO',
-            'filters': ['require_debug_false'],
-            'class': 'logging.FileHandler',
-            'filename': BASE_DIR / 'django.log',
+        "file": {
+            "level": "INFO",
+            "filters": ["require_debug_false"],
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "django.log",
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
+    "loggers": {
+        "django": {"handlers": ["console", "file"], "level": "INFO",},
+        "django.server": {
+            "handlers": ["django.server"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'django.server': {
-            'handlers': ['django.server'],
-            'level': 'INFO',
-            'propagate': False,
+        "ctfexam": {"handlers": ["console", "mail_admins", "file"], "level": "INFO",},
+        "challenges": {
+            "handlers": ["console", "mail_admins", "file"],
+            "level": "INFO",
         },
-        'ctfexam': {
-            'handlers': ['console', 'mail_admins', 'file'],
-            'level': 'INFO',
-        },
-        'challenges': {
-            'handlers': ['console', 'mail_admins', 'file'],
-            'level': 'INFO',
-        },
-    }
+    },
 }
 
 try:

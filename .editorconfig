@@ -1,0 +1,20 @@
+# see http://editorconfig.org
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+[*.{py,css,scss,js,html}]
+charset = utf-8
+indent_style = space
+trim_trailing_whitespace = true
+
+[*.{py,css,scss,js}]
+indent_size = 4
+
+[*.html]
+indent_size = 4
+
+[*.{yml,yaml}]
+indent_size = 2
