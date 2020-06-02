@@ -125,11 +125,12 @@ category = "main"
 description = "Bootstrap support for Django projects"
 name = "django-bootstrap4"
 optional = false
-python-versions = "*"
-version = "1.1.1"
+python-versions = ">=3.6,<4.0"
+version = "2.0.0"
 
 [package.dependencies]
-beautifulsoup4 = "*"
+beautifulsoup4 = ">=4.9.1,<5.0.0"
+django = ">=2.2,<4.0"
 
 [[package]]
 category = "dev"
@@ -146,6 +147,7 @@ django = ">=1.8"
 reference = "0c5a547b0567b9b1c202292e019bc623f2cbd6b1"
 type = "git"
 url = "https://github.com/thomwiggers/django-template-check.git"
+
 [[package]]
 category = "main"
 description = "A Python library for the Docker Engine API."
@@ -376,7 +378,7 @@ version = "0.57.0"
 six = "*"
 
 [metadata]
-content-hash = "55ce4045f2b065fcf260ef4ee110d618c8465541ee741cda2ac3661ce213e8e8"
+content-hash = "85547103b0a2697633d353088ae453fd653e3a3e3ea54b80bb000d0bc2a37437"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -422,8 +424,8 @@ django = [
     {file = "Django-3.1a1.tar.gz", hash = "sha256:dd96f98ec1c3e60877d45cea7350215f16de409848d23cced8443db1b188bd9b"},
 ]
 django-bootstrap4 = [
-    {file = "django-bootstrap4-1.1.1.tar.gz", hash = "sha256:39f97cbce85eb66f6d76be2029bae171bd3863d0c6932b1c2dae7f299c569b90"},
-    {file = "django_bootstrap4-1.1.1-py3-none-any.whl", hash = "sha256:0fcd84f8414a58b43df0b331c00c8b2f1786ae28f75f419b4d33b06fca43e0d1"},
+    {file = "django-bootstrap4-2.0.0.tar.gz", hash = "sha256:2618205322306b1cf3e4e67ec9d42cdf30b2656bf06d2b65d17498b0b2667271"},
+    {file = "django_bootstrap4-2.0.0-py3-none-any.whl", hash = "sha256:ca51246ea4a0bc06f7fa4305cefe7f7700cc09e7da1280f7bea5213470bb673d"},
 ]
 django-template-check = []
 docker = [
