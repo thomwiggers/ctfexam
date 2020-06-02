@@ -5,34 +5,34 @@ from pathlib import Path
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-MEDIA_ROOT = BASE_DIR / '..' / 'media'
-STATIC_ROOT = BASE_DIR / '..' / 'static'
+MEDIA_ROOT = BASE_DIR / ".." / "media"
+STATIC_ROOT = BASE_DIR / ".." / "static"
 
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    'hackme.rded.nl',
+    "hackme.rded.nl",
 ]
 
-DJANGO_HOST = 'hackme.rded.nl'
+DJANGO_HOST = "hackme.rded.nl"
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
-ADMINS = [('Name', 'Email')]
+ADMINS = [("Name", "Email")]
 
-assert 'SECRET_KEY' in os.environ
+assert "SECRET_KEY" in os.environ
 
 from students import VALID_STUDENT_NUMBERS
 
-SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-SERVER_EMAIL = 'noreply@hackme.rded.nl'
-DEFAULT_FROM_EMAIL = 'noreply@hackme.rded.nl'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+SERVER_EMAIL = "noreply@hackme.rded.nl"
+DEFAULT_FROM_EMAIL = "noreply@hackme.rded.nl"
 
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'apikey'      # this is exactly the value 'apikey'
+EMAIL_HOST = "smtp.sendgrid.net"
+EMAIL_HOST_USER = "apikey"  # this is exactly the value 'apikey'
 EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

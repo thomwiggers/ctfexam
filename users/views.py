@@ -6,9 +6,9 @@ from . import forms
 
 
 class UserRegistration(FormView):
-    template_name = 'ctf/form.html'
+    template_name = "ctf/form.html"
     form_class = forms.UserCreationForm
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy("index")
 
     def form_valid(self, form):
         form.save()
@@ -16,6 +16,6 @@ class UserRegistration(FormView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['title'] = "Register"
+        context["title"] = "Register"
 
         return context

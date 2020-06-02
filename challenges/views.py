@@ -15,15 +15,10 @@ import bleach
 from . import models
 
 
-
 def markdownize(text):
     if text is not None:
-        return markdown.markdown(
-            text,
-            extensions=['extra', 'smarty', 'codehilite'],
-        )
-    return ''
-
+        return markdown.markdown(text, extensions=["extra", "smarty", "codehilite"],)
+    return ""
 
 
 class ChallengeListView(TemplateView):
@@ -36,8 +31,7 @@ class ChallengeListView(TemplateView):
         try:
             if not user.is_anonymous:
                 user_entry = challenge.completed_entries.get(user=user)
-                finished = (user_entry.completion_time is not None
-                            and user_entry.writeup)
+                finished = user_entry.completion_time is not None and user_entry.writeup
             else:
                 user_entry = None
                 finished = None
@@ -46,15 +40,15 @@ class ChallengeListView(TemplateView):
             finished = False
 
         return {
-            'obj': challenge,
-            'finished': finished,
-            'user_entry': user_entry,
+            "obj": challenge,
+            "finished": finished,
+            "user_entry": user_entry,
         }
 
     def get_context_data(self, *args, **kwargs):
         """Get the data necessary for the view"""
         context = super().get_context_data(*args, **kwargs)
-        context['challenges'] = [
+        context["challenges"] = [
             self._format_challenge(challenge)
             for challenge in models.Challenge.objects.all()
         ]
@@ -68,15 +62,15 @@ class ChallengeDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         try:
-            context['user_entry'] = entry = (
-                self.object.challengeentry_set.get(user=self.request.user))
-            context['processes'] = (
-                entry.challengeprocess_set.filter(running=True))
-            context['writeup_html'] = markdownize(entry.writeup)
+            context["user_entry"] = entry = self.object.challengeentry_set.get(
+                user=self.request.user
+            )
+            context["processes"] = entry.challengeprocess_set.filter(running=True)
+            context["writeup_html"] = markdownize(entry.writeup)
         except models.ChallengeEntry.DoesNotExist:
-            context['user_entry'] = None
-        context['docker_host'] = settings.DOCKER_HOST
-        context['description'] = markdownize(self.object.description)
+            context["user_entry"] = None
+        context["docker_host"] = settings.DOCKER_HOST
+        context["description"] = markdownize(self.object.description)
         return context
 
 
@@ -84,29 +78,29 @@ class SubmitFlag(LoginRequiredMixin, View):
     def post(self, request, pk):
         challenge = get_object_or_404(models.Challenge, pk=pk)
         entry, _new = models.ChallengeEntry.objects.get_or_create(
-            challenge=challenge,
-            user=request.user,
+            challenge=challenge, user=request.user,
         )
-        flag = request.POST.get('flag')
-        return JsonResponse({'correct': entry.submit_flag(flag)})
+        flag = request.POST.get("flag")
+        return JsonResponse({"correct": entry.submit_flag(flag)})
 
 
 class SubmitWriteup(LoginRequiredMixin, View):
     def post(self, request, pk):
         challenge = get_object_or_404(models.Challenge, pk=pk)
         entry, _new = models.ChallengeEntry.objects.get_or_create(
-            challenge=challenge,
-            user=request.user,
+            challenge=challenge, user=request.user,
         )
-        writeup = request.POST.get('writeup')
+        writeup = request.POST.get("writeup")
         if writeup is None:
             return JsonResponse({"error": "no writeup included"}, status=400)
-        entry.writeup = writeup = unescape(bleach.clean(
-            writeup,
-            attributes=bleach.sanitizer.ALLOWED_ATTRIBUTES,
-            tags=bleach.sanitizer.ALLOWED_TAGS,
-            strip=True,
-        ))
+        entry.writeup = writeup = unescape(
+            bleach.clean(
+                writeup,
+                attributes=bleach.sanitizer.ALLOWED_ATTRIBUTES,
+                tags=bleach.sanitizer.ALLOWED_TAGS,
+                strip=True,
+            )
+        )
         entry.save()
         return JsonResponse({"preview_html": markdownize(writeup)})
 
@@ -115,21 +109,16 @@ class ChallengeProcessCreateView(LoginRequiredMixin, View):
     def post(self, request, pk):
         challenge = get_object_or_404(models.Challenge, pk=pk)
         entry, _new = models.ChallengeEntry.objects.get_or_create(
-            challenge=challenge,
-            user=request.user,
+            challenge=challenge, user=request.user,
         )
         models.ChallengeProcess.start(entry)
-        return JsonResponse({
-            'started': True,
-        })
+        return JsonResponse({"started": True,})
 
 
 class ChallengeProcessStopView(LoginRequiredMixin, View):
     def post(self, request, pk):
         process = get_object_or_404(
-            models.ChallengeProcess,
-            pk=pk, challenge_entry__user=request.user)
+            models.ChallengeProcess, pk=pk, challenge_entry__user=request.user
+        )
         process.delete()
-        return JsonResponse({
-            'stopped': True,
-        })
+        return JsonResponse({"stopped": True,})

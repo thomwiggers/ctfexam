@@ -5,4 +5,4 @@ from django.shortcuts import render
 def index(request: HttpRequest) -> HttpResponse:
     """Render the index"""
 
-    return render(request, 'ctf/index.html')
+    return render(request, "ctf/index.html")
