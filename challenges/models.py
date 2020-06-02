@@ -58,10 +58,10 @@ def random_settings():
 class ChallengeEntry(models.Model):
     """Models a challenge being taken by a user"""
 
-    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE,)
+    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
 
     #: The flag that completes this challenge
-    settings = models.JSONField(default=random_settings,)
+    settings = models.JSONField(default=random_settings)
 
     #: The user taking this challenge
     user = models.ForeignKey(django_settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -227,15 +227,25 @@ class ChallengeProcess(models.Model):
         client = docker.DockerClient.from_env()
         dockerid = self.process_identifier
 
-        try:
-            for name in ["vuln", "proxy"]:
+        def stop_container(name):
+            try:
                 container = client.containers.get(f"{dockerid}_{name}")
                 container.stop(timeout=2)
-            for name in ["internal", "public"]:
+            except docker.errors.NotFound:
+                logger.exception("Container %s_%s already stopped", dockerid, name)
+
+        def remove_network(name):
+            try:
                 network = client.networks.get(f"{dockerid}_{name}_network")
                 network.remove()
-        except docker.errors.NotFound:
-            logger.exception("Couldn't finish cleanup")
+            except docker.errors.NotFound:
+                pass
+
+        for name in ["vuln", "proxy"]:
+            stop_container(name)
+        for name in ["internal", "public"]:
+            remove_network(name)
+
         self.running = False
         self.save()
 
