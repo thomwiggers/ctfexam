@@ -22,7 +22,7 @@ def find_student_numbers(text, mine):
             found.append(student_number)
     if found:
         return found
-    # try again without s-number
+    # try again without leading letter
     for student_number in settings.VALID_STUDENT_NUMBERS:
         if student_number[1:] in text:
             found.append(student_number)
