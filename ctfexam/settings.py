@@ -14,8 +14,7 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
 # MEDIA root
 MEDIA_ROOT = BASE_DIR / "media"
@@ -51,6 +50,17 @@ INSTALLED_APPS = [
     # Admin
     "django.contrib.admin",
 ]
+
+
+# enable template check if it's installed
+# this allows us to not have it enabled in production
+try:
+    import django_template_check
+
+    del django_template_check
+    INSTALLED_APPS.append("django_template_check")
+except ImportError:
+    pass
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -90,7 +100,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-        "OPTIONS": {"timeout": 20,},
+        "OPTIONS": {"timeout": 20},
     }
 }
 
@@ -186,13 +196,13 @@ LOGGING = {
         },
     },
     "loggers": {
-        "django": {"handlers": ["console", "file"], "level": "INFO",},
+        "django": {"handlers": ["console", "file"], "level": "INFO"},
         "django.server": {
             "handlers": ["django.server"],
             "level": "INFO",
             "propagate": False,
         },
-        "ctfexam": {"handlers": ["console", "mail_admins", "file"], "level": "INFO",},
+        "ctfexam": {"handlers": ["console", "mail_admins", "file"], "level": "INFO"},
         "challenges": {
             "handlers": ["console", "mail_admins", "file"],
             "level": "INFO",

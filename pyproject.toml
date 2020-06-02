@@ -17,6 +17,7 @@ sentry-sdk = "^0.14.4"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
+django-template-check = {git = "https://github.com/thomwiggers/django-template-check.git", rev = "update-tests"}
 
 [tool.black]
 exclude = '(/(\.eggs|\.git|\.tox)/|migrations)'

@@ -132,6 +132,21 @@ version = "1.1.1"
 beautifulsoup4 = "*"
 
 [[package]]
+category = "dev"
+description = "Perform (minimal) syntax checks for Django templates."
+name = "django-template-check"
+optional = false
+python-versions = "*"
+version = "0.3.1"
+
+[package.dependencies]
+django = ">=1.8"
+
+[package.source]
+reference = "0c5a547b0567b9b1c202292e019bc623f2cbd6b1"
+type = "git"
+url = "https://github.com/thomwiggers/django-template-check.git"
+[[package]]
 category = "main"
 description = "A Python library for the Docker Engine API."
 name = "docker"
@@ -361,7 +376,7 @@ version = "0.57.0"
 six = "*"
 
 [metadata]
-content-hash = "138646969a3b19981f39d5627c7c75f5ffbedcd861cd18f755deaf96c62dd13a"
+content-hash = "55ce4045f2b065fcf260ef4ee110d618c8465541ee741cda2ac3661ce213e8e8"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -410,6 +425,7 @@ django-bootstrap4 = [
     {file = "django-bootstrap4-1.1.1.tar.gz", hash = "sha256:39f97cbce85eb66f6d76be2029bae171bd3863d0c6932b1c2dae7f299c569b90"},
     {file = "django_bootstrap4-1.1.1-py3-none-any.whl", hash = "sha256:0fcd84f8414a58b43df0b331c00c8b2f1786ae28f75f419b4d33b06fca43e0d1"},
 ]
+django-template-check = []
 docker = [
     {file = "docker-4.2.0-py2.py3-none-any.whl", hash = "sha256:1c2ddb7a047b2599d1faec00889561316c674f7099427b9c51e8cb804114b553"},
     {file = "docker-4.2.0.tar.gz", hash = "sha256:ddae66620ab5f4bce769f64bcd7934f880c8abe6aa50986298db56735d0f722e"},
