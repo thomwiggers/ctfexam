@@ -6,4 +6,8 @@ from . import models
 
 admin.site.register(models.Challenge)
 admin.site.register(models.ChallengeEntry)
-admin.site.register(models.ChallengeProcess)
+
+class ChallengeProcessAdmin(admin.ModelAdmin):
+    readonly_fields = ('started',)
+
+admin.site.register(models.ChallengeProcess, ChallengeProcessAdmin)

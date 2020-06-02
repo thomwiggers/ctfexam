@@ -83,8 +83,9 @@
             <div class="card-body">
                 Connect to this challenge on <code>{{ docker_host }}</code> on port {{ process.port.port }}, for example using the following commands:
 <pre>
-echo "Hello world" | nc {{ docker_host }} {{ process.port.port }}
+nc {{ docker_host }} {{ process.port.port }}
 </pre>
+                This instance has been running since {{ process.started }}.
                 {% buttons %}
                 <button type="submit" class="btn btn-danger" id="stop-process-{{ process.pk }}">
                     Stop process
@@ -170,9 +171,11 @@ echo "Hello world" | nc {{ docker_host }} {{ process.port.port }}
                     "method": "POST",
                 }).done((data, textStatus, jqXHR) => {
                     console.log("Successfully started, reloading page");
+                    saveForm();
                     location.reload();
                 }).fail((data, textStatus, jqXHR) => {
                     alert("Starting process failed");
+                    saveForm();
                     console.log(data, textStatus, jqXHR);
                 });
             });
@@ -185,9 +188,11 @@ echo "Hello world" | nc {{ docker_host }} {{ process.port.port }}
                     "method": "POST",
                 }).done((data, textStatus, jqXHR) => {
                     console.log("Successfully started, reloading page");
+                    saveForm();
                     location.reload();
                 }).fail((data, textStatus, jqXHR) => {
                     alert("Stopping process failed");
+                    saveForm();
                     console.log(data, textStatus, jqXHR);
                 });
             });
@@ -195,6 +200,9 @@ echo "Hello world" | nc {{ docker_host }} {{ process.port.port }}
 
 
             function saveForm() {
+                if (!writeupChanged) {
+                    return;
+                }
                 $.ajax({
                     "dataType": "json",
                     "url": "{% url 'challenges:submit_writeup' pk=object.pk %}",
@@ -214,7 +222,9 @@ echo "Hello world" | nc {{ docker_host }} {{ process.port.port }}
 
             // empty timeout as placeholder
             var timer = setTimeout(() => {}, 1000000);
+            var writeupChanged = false;
             $("#writeup").keydown((event) => {
+                writeupChanged = true;
                 clearTimeout(timer);
                 timer = setTimeout(saveForm, 2000);
             });

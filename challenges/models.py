@@ -126,13 +126,15 @@ class ChallengeProcess(models.Model):
     objects = models.Manager()
     running_challenges = ActiveChallengesManager()
 
-    challenge_entry = models.ForeignKey("ChallengeEntry", on_delete=models.CASCADE,)
+    challenge_entry = models.ForeignKey("ChallengeEntry", on_delete=models.CASCADE)
 
     running = models.BooleanField(default=False)
 
     port = models.OneToOneField(Port, blank=True, null=True, on_delete=models.PROTECT)
 
     process_identifier = models.TextField()
+
+    started = models.DateTimeField(auto_now_add=True)
 
     @classmethod
     def cleanup(cls):
@@ -178,7 +180,7 @@ class ChallengeProcess(models.Model):
             challenge_container,
             name=f"{dockerid}_vuln",
             detach=True,
-            auto_remove=True,
+            auto_remove=False,
             cpu_quota=5000,  # 5%
             mem_limit="50m",
             network_mode=None,
