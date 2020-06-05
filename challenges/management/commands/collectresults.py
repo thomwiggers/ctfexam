@@ -46,7 +46,9 @@ class Command(BaseCommand):
             challenge_dir = user_dir / slugify(entry.challenge.title)
             challenge_dir.mkdir(parents=True)
 
-            partners = find_student_numbers(entry.writeup, user.student_number)
+            partners = None
+            if entry.writeup:
+                partners = find_student_numbers(entry.writeup, user.student_number)
 
             with open(challenge_dir / "challenge.md", "w") as f:
                 f.write(challenge_template.render({"challenge": entry.challenge}))
