@@ -52,6 +52,7 @@ def random_settings():
     return {
         "flag": f"HiCCTF{{{get_random_string(length=64)}}}",
         "buffer_padding": random.randint(1, 75),
+        "memory_padding": "A"*random.randint(1, 200),
     }
 
 
