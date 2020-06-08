@@ -77,7 +77,7 @@ class ChallengeDetailView(LoginRequiredMixin, DetailView):
 class SubmitFlag(LoginRequiredMixin, View):
     def post(self, request, pk):
         challenge = get_object_or_404(models.Challenge, pk=pk)
-        if not challenge.is_available:
+        if not challenge.is_active:
             raise Http404
         entry, _new = models.ChallengeEntry.objects.get_or_create(
             challenge=challenge, user=request.user,
@@ -89,7 +89,7 @@ class SubmitFlag(LoginRequiredMixin, View):
 class SubmitWriteup(LoginRequiredMixin, View):
     def post(self, request, pk):
         challenge = get_object_or_404(models.Challenge, pk=pk)
-        if not challenge.is_available:
+        if not challenge.is_active:
             raise Http404
         entry, _new = models.ChallengeEntry.objects.get_or_create(
             challenge=challenge, user=request.user,
@@ -112,7 +112,7 @@ class SubmitWriteup(LoginRequiredMixin, View):
 class ChallengeProcessCreateView(LoginRequiredMixin, View):
     def post(self, request, pk):
         challenge = get_object_or_404(models.Challenge, pk=pk)
-        if not challenge.is_available:
+        if not challenge.is_active:
             raise Http404
         entry, _new = models.ChallengeEntry.objects.get_or_create(
             challenge=challenge, user=request.user,
