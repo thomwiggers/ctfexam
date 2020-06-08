@@ -2,7 +2,7 @@ from html import unescape
 from typing import Dict
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.views.generic import TemplateView, DetailView, View
 from django.views.generic.edit import CreateView
 from django.shortcuts import render, get_object_or_404
@@ -50,14 +50,14 @@ class ChallengeListView(TemplateView):
         context = super().get_context_data(*args, **kwargs)
         context["challenges"] = [
             self._format_challenge(challenge)
-            for challenge in models.Challenge.objects.all()
+            for challenge in models.Challenge.available.all()
         ]
 
         return context
 
 
 class ChallengeDetailView(LoginRequiredMixin, DetailView):
-    model = models.Challenge
+    queryset = models.Challenge.available.all()
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -77,6 +77,8 @@ class ChallengeDetailView(LoginRequiredMixin, DetailView):
 class SubmitFlag(LoginRequiredMixin, View):
     def post(self, request, pk):
         challenge = get_object_or_404(models.Challenge, pk=pk)
+        if not challenge.is_available:
+            raise Http404
         entry, _new = models.ChallengeEntry.objects.get_or_create(
             challenge=challenge, user=request.user,
         )
@@ -87,6 +89,8 @@ class SubmitFlag(LoginRequiredMixin, View):
 class SubmitWriteup(LoginRequiredMixin, View):
     def post(self, request, pk):
         challenge = get_object_or_404(models.Challenge, pk=pk)
+        if not challenge.is_available:
+            raise Http404
         entry, _new = models.ChallengeEntry.objects.get_or_create(
             challenge=challenge, user=request.user,
         )
@@ -108,11 +112,13 @@ class SubmitWriteup(LoginRequiredMixin, View):
 class ChallengeProcessCreateView(LoginRequiredMixin, View):
     def post(self, request, pk):
         challenge = get_object_or_404(models.Challenge, pk=pk)
+        if not challenge.is_available:
+            raise Http404
         entry, _new = models.ChallengeEntry.objects.get_or_create(
             challenge=challenge, user=request.user,
         )
         models.ChallengeProcess.start(entry)
-        return JsonResponse({"started": True,})
+        return JsonResponse({"started": True})
 
 
 class ChallengeProcessStopView(LoginRequiredMixin, View):
@@ -121,4 +127,4 @@ class ChallengeProcessStopView(LoginRequiredMixin, View):
             models.ChallengeProcess, pk=pk, challenge_entry__user=request.user
         )
         process.delete()
-        return JsonResponse({"stopped": True,})
+        return JsonResponse({"stopped": True})

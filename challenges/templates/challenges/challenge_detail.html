@@ -5,6 +5,7 @@
 
 {% block body %}
     <h1>{{ object.title }}</h1>
+    <h4>Deadline: {{ object.end_time|date:"DATETIME_FORMAT" }}</h4>
     <div class="row">
         <div class="card mb-4 w-100">
             <div class="card-body">

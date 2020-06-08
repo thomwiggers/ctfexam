@@ -17,6 +17,7 @@
           </div>
           <div class="card-footer">
             <ul>
+              <li>Deadline: {{ challenge.obj.end_time|date:"DATETIME_FORMAT" }}</li>
               {% with starters=challenge.obj.challengeentry_set.count %}
                 <li>Started by {{starters}} student{{ starters|pluralize }}</li>
               {% endwith %}

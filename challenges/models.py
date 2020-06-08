@@ -18,8 +18,20 @@ from django.urls import reverse
 logger = logging.getLogger(__name__)
 
 
+class AvailableChallengeManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(start_time__lte=timezone.now(), end_time__gt=timezone.now())
+        )
+
+
 class Challenge(models.Model):
     """Represents a challenge"""
+
+    objects = models.Manager()
+    available = AvailableChallengeManager()
 
     title = models.CharField(max_length=100)
 
@@ -28,6 +40,18 @@ class Challenge(models.Model):
     solution = models.TextField()
 
     container = models.CharField(max_length=255)
+
+    start_time = models.DateTimeField(
+        help_text="available from this time", default=timezone.now
+    )
+
+    end_time = models.DateTimeField("no longer available after")
+
+    @property
+    def is_active(self):
+        """Is this challenge currently active?"""
+        now = timezone.now()
+        return self.start_time <= now < self.end_time
 
     @property
     def completed_entries(self):
@@ -52,7 +76,7 @@ def random_settings():
     return {
         "flag": f"HiCCTF{{{get_random_string(length=64)}}}",
         "buffer_padding": random.randint(1, 75),
-        "memory_padding": "A"*random.randint(1, 200),
+        "memory_padding": "A" * random.randint(1, 200),
     }
 
 
