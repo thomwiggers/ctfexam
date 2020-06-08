@@ -132,6 +132,9 @@ class Port(models.Model):
 
     port = models.PositiveIntegerField(primary_key=True)
 
+    def __str__(self):
+        return f"Port {self.port}"
+
     @classmethod
     def get_new_port(cls):
         return cls.available_ports.order_by("?").first()
@@ -277,7 +280,7 @@ class ChallengeProcess(models.Model):
     stop.alters_data = True
 
     def __str__(self):
-        return f"Process for {self.challenge_entry}"
+        return f"Process for {self.challenge_entry} on port {self.port}"
 
 
 @receiver(
