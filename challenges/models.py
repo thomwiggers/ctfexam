@@ -211,7 +211,7 @@ class ChallengeProcess(models.Model):
             network_mode=None,
             hostname="vulnhost",
             stop_signal="SIGKILL",
-            pids_limit=10,
+            pids_limit=20,
             privileged=True,
             cap_drop=["ALL"],
             environment={
