@@ -101,7 +101,7 @@ class ChallengeEntry(models.Model):
         return self.settings.get("flag", get_random_string(length=64))
 
     def submit_flag(self, flag):
-        if flag is None:
+        if flag is None or not flag.isascii():
             return False
         if secrets.compare_digest(self.flag, flag):
             self.completion_time = timezone.now()
