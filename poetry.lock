@@ -109,7 +109,7 @@ description = "A high-level Python Web framework that encourages rapid developme
 name = "django"
 optional = false
 python-versions = ">=3.6"
-version = "3.1a1"
+version = "3.1b1"
 
 [package.dependencies]
 asgiref = ">=3.2"
@@ -378,7 +378,7 @@ version = "0.57.0"
 six = "*"
 
 [metadata]
-content-hash = "85547103b0a2697633d353088ae453fd653e3a3e3ea54b80bb000d0bc2a37437"
+content-hash = "a6bb1c5ed28d9db932fa7943c4caf43859c6761241403b90de1bf5d32750f3aa"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -420,8 +420,8 @@ click = [
     {file = "click-7.1.2.tar.gz", hash = "sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"},
 ]
 django = [
-    {file = "Django-3.1a1-py3-none-any.whl", hash = "sha256:db4c9b29615d17f808f2b1914d5cd73cd457c9fd90581195172c0888c210d944"},
-    {file = "Django-3.1a1.tar.gz", hash = "sha256:dd96f98ec1c3e60877d45cea7350215f16de409848d23cced8443db1b188bd9b"},
+    {file = "Django-3.1b1-py3-none-any.whl", hash = "sha256:ccf6c208424c0e1b0eaffd36efe12618a9ab4d0037e26f6ffceaa5277af985d7"},
+    {file = "Django-3.1b1.tar.gz", hash = "sha256:045be31d68dfed684831e39ab1d9e77a595f1a393935cb43b6c5451d2e78c8a4"},
 ]
 django-bootstrap4 = [
     {file = "django-bootstrap4-2.0.0.tar.gz", hash = "sha256:2618205322306b1cf3e4e67ec9d42cdf30b2656bf06d2b65d17498b0b2667271"},
