@@ -209,7 +209,8 @@ class ChallengeProcess(models.Model):
             name=f"{dockerid}_vuln",
             detach=True,
             auto_remove=False,
-            cpu_quota=5000,  # 5%
+            cpu_period=100,  # 100microsec
+            cpu_quota=5,     # 5%
             mem_limit="50m",
             network_mode=None,
             hostname="vulnhost",
@@ -228,7 +229,8 @@ class ChallengeProcess(models.Model):
                 name=f"{dockerid}_proxy",
                 detach=True,
                 auto_remove=True,
-                cpu_quota=10000,  # 5%
+                cpu_period=100,  # 100microsec
+                cpu_quota=5,     # 5%
                 mem_limit="100m",
                 network=f"{dockerid}_public_network",
                 stop_signal="SIGKILL",
