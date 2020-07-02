@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block pagetitle %}FAQ – {{ block.super }}{% endblock %}
+
+
+{% block body %}
+    <h1> FAQ </h1>
+
+    <p>These answers should hopefully answer some of your questions surrounding the <code>ctfexam</code> platform.
+
+    <dl>
+        <dt>What are flags?</dt>
+        <dd>Flags are strings that are embedded in each challenge. In each challenge, you aim to obtain the flag. How you do that depends on each challenge — for some, you may just need to give it the right input, for others, you may need to obtain a shell to read a file.</dd>
+
+        <dt>What do the flags look like?</dt>
+        <dd>All flags have the format <code>HiCCTF{64 characters in A-Z a-z 0-9}</code>. They only exist of printable ASCII characters.</dd>
+
+        <dt>Can I still do the hacking challenge after I submit the flag?</dt>
+        <dd>Yes. Simply start a new process if your previous session has ended and you can obtain the flag again.</dd>
+
+        <dt>Can I still change my write-up after submitting the flag?</dt>
+        <dd>Yes. Submitting the flag is completely separate from the write-up.</dd>
+
+        <dt>I can't register for the site.</dt>
+        <dd>The site operates with a student number whitelist. Contact the teacher.</dd>
+
+        <dt>I can't reset my password.</dt>
+        <dd>Check your spam folder, otherwise contact the teacher.</dd>
+
+        <dt>What is this website?</dt>
+        <dd>
+            This website was built for Hacking in C, to host hacking challenges.
+            It is built using Django and uses Docker to run the challenges.
+            The source code for the website <a href="https://github.com/thomwiggers/ctfexam">can be found on Github</a>.
+            The source code for the challenges is obviously private.
+            Contributions, within the scope of this project, are welcome and can be proposed through Github.
+        </dd>
+
+    </dl>
+
+{% endblock %}
