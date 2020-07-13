@@ -57,7 +57,9 @@ class ChallengeListView(TemplateView):
 
 
 class ChallengeDetailView(LoginRequiredMixin, DetailView):
-    queryset = models.Challenge.available.all()
+    def get_queryset(self):
+        # Needs to be active because otherwise we copy the old date
+        return models.Challenge.available.all()
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

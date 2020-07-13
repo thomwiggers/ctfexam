@@ -230,7 +230,7 @@ class ChallengeProcess(models.Model):
                 detach=True,
                 auto_remove=True,
                 cpu_period=100000,
-                cpu_quota=5000,  # 5%
+                cpu_quota=10000,  # 10%
                 mem_limit="100m",
                 network=f"{dockerid}_public_network",
                 stop_signal="SIGKILL",
