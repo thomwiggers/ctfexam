@@ -109,10 +109,10 @@ description = "A high-level Python Web framework that encourages rapid developme
 name = "django"
 optional = false
 python-versions = ">=3.6"
-version = "3.1b1"
+version = "3.1rc1"
 
 [package.dependencies]
-asgiref = ">=3.2"
+asgiref = ">=3.2.10,<3.3.0"
 pytz = "*"
 sqlparse = ">=0.2.2"
 
@@ -150,6 +150,7 @@ django = ">=1.8"
 reference = "0c5a547b0567b9b1c202292e019bc623f2cbd6b1"
 type = "git"
 url = "https://github.com/thomwiggers/django-template-check.git"
+
 [[package]]
 category = "main"
 description = "A Python library for the Docker Engine API."
@@ -380,7 +381,7 @@ version = "0.57.0"
 six = "*"
 
 [metadata]
-content-hash = "3842b03dad551d5a8892b5f57e869e67fdb6c84dcd86ca7cd91b5f35b2f96119"
+content-hash = "3584614587309a9d7d25646403270f8b03cbaf4c2dfddf534376b5258650794e"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -422,8 +423,8 @@ click = [
     {file = "click-7.1.2.tar.gz", hash = "sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"},
 ]
 django = [
-    {file = "Django-3.1b1-py3-none-any.whl", hash = "sha256:ccf6c208424c0e1b0eaffd36efe12618a9ab4d0037e26f6ffceaa5277af985d7"},
-    {file = "Django-3.1b1.tar.gz", hash = "sha256:045be31d68dfed684831e39ab1d9e77a595f1a393935cb43b6c5451d2e78c8a4"},
+    {file = "Django-3.1rc1-py3-none-any.whl", hash = "sha256:e5893668d8981a35a5bed8287c56363f83181566037e5beabe09d2a29c8bf4ce"},
+    {file = "Django-3.1rc1.tar.gz", hash = "sha256:a805872093720658e2b858a51c1b43a634790df073b732832d6b8080c38d6263"},
 ]
 django-bootstrap4 = [
     {file = "django-bootstrap4-2.2.0.tar.gz", hash = "sha256:1c0a931b4245a0dcd5051ea1b244ac130a328374ce8e85254c75eb072a737201"},
