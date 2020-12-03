@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 class AvailableChallengeManager(models.Manager):
     """Available challenges"""
+
     def get_queryset(self):
         return (
             super()
@@ -30,13 +31,10 @@ class AvailableChallengeManager(models.Manager):
             .filter(start_time__lte=timezone.now(), end_time__gt=timezone.now())
         )
 
+
 def ports_default():
     """Default ports"""
-    return [{
-        "port": 1337,
-        "description": "challenge port",
-        "logged": True,
-    }]
+    return [{"port": 1337, "description": "challenge port", "logged": True,}]
 
 
 class Challenge(models.Model):
@@ -160,12 +158,16 @@ class ChallengeProcess(models.Model):
         try:
             listen_ports = self.challenge_entry.challenge.ports
             for port_data in listen_ports:
-                port = port_data['port']
+                port = port_data["port"]
                 cont = client.containers.get(f"{self.process_identifier}_proxy_{port}")
-                external_ports.append({
-                    "port": cont.ports.get("4000/tcp", [{"HostPort": None}])[0]["HostPort"],
-                    "description": port_data['description'],
-                })
+                external_ports.append(
+                    {
+                        "port": cont.ports.get("4000/tcp", [{"HostPort": None}])[0][
+                            "HostPort"
+                        ],
+                        "description": port_data["description"],
+                    }
+                )
         except docker.errors.NotFound:
             self.stop()
         return external_ports
@@ -244,7 +246,10 @@ class ChallengeProcess(models.Model):
                     network=f"{dockerid}_public_network",
                     stop_signal="SIGKILL",
                     cap_add=["CHOWN"],
-                    environment={"VULNHOST": "vulnhost", "VULNPORT": f"{port['port']}",},
+                    environment={
+                        "VULNHOST": "vulnhost",
+                        "VULNPORT": f"{port['port']}",
+                    },
                     ports={"4000": None},
                     volumes={str(logdir): {"bind": "/log/", "mode": "rw"},},
                 )

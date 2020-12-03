@@ -38,15 +38,13 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'django',
-    },
+    "default": {"ENGINE": "django.db.backends.postgresql", "NAME": "django",},
 }
 
-if 'SENTRY_DSN' in os.environ:
+if "SENTRY_DSN" in os.environ:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
+
     sentry_sdk.init(
         dsn=os.environ.get("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
