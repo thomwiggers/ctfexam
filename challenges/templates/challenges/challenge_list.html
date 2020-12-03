@@ -28,6 +28,8 @@
           </div>
         </div>
       </div>
+    {% else %}
+      <div class="alert alert-danger" role="alert">No challenges available</alert>
     {% endfor %}
 {% endblock %}
 <!-- vim: set ft=jinja.html ts=4 sw=2 tw=0 et :-->
