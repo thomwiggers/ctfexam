@@ -148,6 +148,10 @@ class ChallengeProcess(models.Model):
 
     running = models.BooleanField(default=False)
 
+    process_identifier = models.TextField()
+
+    started = models.DateTimeField(auto_now_add=True)
+
     @property
     def ports(self):
         """Get the remotely accessible port"""
@@ -162,11 +166,14 @@ class ChallengeProcess(models.Model):
                 port = port_data["port"]
                 if port_data['logged']:
                     cont = client.containers.get(f"{self.process_identifier}_proxy_{port}")
+                    internal_port = "4000/tcp"
                 else:
                     cont = client.containers.get(f"{self.process_identifier}_vuln")
+                    internal_port = f"{port}/tcp"
+                cont.reload()
                 external_ports.append(
                     {
-                        "port": cont.ports.get("4000/tcp", [{"HostPort": None}])[0][
+                        "port": cont.ports.get(internal_port, [{"HostPort": None}])[0][
                             "HostPort"
                         ],
                         "description": port_data["description"],
@@ -175,10 +182,6 @@ class ChallengeProcess(models.Model):
         except docker.errors.NotFound:
             self.stop()
         return external_ports
-
-    process_identifier = models.TextField()
-
-    started = models.DateTimeField(auto_now_add=True)
 
     @classmethod
     def cleanup(cls):
