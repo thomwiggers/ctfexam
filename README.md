@@ -36,3 +36,4 @@ Hopefully reasonably complete instructions.
 13. Enable the systemd units
 14. ``SECRETKEY=foo ./manage.py migrate``
 15. ``SECRETKEY=foo ./manage.py createsuperuser``
+15. ``SECRETKEY=foo ./manage.py collectstatic``
