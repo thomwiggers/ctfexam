@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block pagetitle %}Hacking in C(TF) – {{ block.super }}{% endblock %}
+{% block pagetitle %}Hackme C(TF) Challenges – {{ block.super }}{% endblock %}
 
 
 {% block body %}
     <h1> Welcome </h1>
     <p class="lead">
-        This is the CTF site. The exam will take place on this platform.
+        Welcome to the CTF challenges website.
     </p>
     <p>
         {% if request.user.is_authenticated %}
@@ -15,9 +15,12 @@
         You can <a href="{% url 'users:register' %}">sign up here</a>.
         {% endif %}
     </p>
+    {% if example %}
     <p>
-        Find an <a href="https://thomwiggers.nl/teaching/hacking-in-c-2020/assignments/writeup-ass5/" target="_blank">example writeup for assignment 5</a>.
+        Find an <a href="https://thomwiggers.nl/teaching/hacking-in-c-2020/assignments/writeup-ass5/" target="_blank">example writeup for assignment 5 from Hacking in C.</a>.
     </p>
+    {% endif %}
+    {% if disclaimer %}
     <p>
         Radboud University wants to contribute to a healthy and free world with equal chances for everyone. To that end, we are training students to become conscientious, involved, critical and self-aware academics. This involves an attitude of reliability and integrity.
     </p>
@@ -27,4 +30,5 @@
     <p>
         We trust that, when you take this exam, you will observe the applicable laws and regulations, that you will not commit identity fraud, plagiarism or another form of fraud and that you will not fraudulently assist other students.
     </p>
+    {% endif %}
 {% endblock %}

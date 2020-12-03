@@ -158,6 +158,9 @@ PROXY_CONTAINER = "eu.gcr.io/hacking-in-c/exam-proxy"
 
 VALID_STUDENT_NUMBERS = None
 
+SHOW_EXAMPLE = False
+SHOW_DISCLAIMER = False
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": True,
