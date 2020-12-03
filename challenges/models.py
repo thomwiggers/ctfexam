@@ -254,8 +254,8 @@ class ChallengeProcess(models.Model):
                     volumes={str(logdir): {"bind": "/log/", "mode": "rw"},},
                 )
                 internal.connect(proxy)
-                internal.connect(vuln, aliases=["vulnhost"])
 
+            internal.connect(vuln, aliases=["vulnhost"])
             cls.objects.create(
                 challenge_entry=challenge_entry,
                 process_identifier=dockerid,
