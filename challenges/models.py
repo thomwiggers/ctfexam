@@ -156,7 +156,7 @@ class ChallengeProcess(models.Model):
         client = docker.DockerClient.from_env()
         external_ports = []
         try:
-            listen_ports = self.challenge_entry.challenge.ports
+            listen_ports = self.challenge_entry.challenge.listen_ports
             for port_data in listen_ports:
                 port = port_data["port"]
                 cont = client.containers.get(f"{self.process_identifier}_proxy_{port}")
@@ -234,7 +234,7 @@ class ChallengeProcess(models.Model):
             },
         )
         with transaction.atomic():
-            for port in challenge.ports:
+            for port in challenge.listen_ports:
                 proxy = client.containers.run(
                     django_settings.PROXY_CONTAINER,
                     name=f"{dockerid}_proxy_{port['port']}",
@@ -286,7 +286,7 @@ class ChallengeProcess(models.Model):
                 pass
 
         stop_container("vuln")
-        for port in self.challenge_entry.challenge.ports:
+        for port in self.challenge_entry.challenge.listen_ports:
             stop_container(f"proxy_{port['port']}")
         for name in ["internal", "public"]:
             remove_network(name)
