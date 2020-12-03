@@ -63,6 +63,12 @@ class Challenge(models.Model):
         default=ports_default,
     )
 
+    privileged = models.BooleanField(
+        _("Needs privileged container"),
+        help_text=_("containers that disable ASLR need this."),
+        default=False,
+    )
+
     @property
     def is_active(self):
         """Is this challenge currently active?"""
@@ -234,14 +240,15 @@ class ChallengeProcess(models.Model):
             auto_remove=False,
             cpu_period=100000,
             cpu_quota=5000,  # 5%
-            mem_limit="50m",
+            mem_limit="150m",
             network_mode=None,
             hostname="vulnhost",
             stop_signal="SIGKILL",
-            pids_limit=20,
-            privileged=True,
+            pids_limit=100,
+            privileged=challenge.privileged,
             ports=public_ports,
             cap_drop=["ALL"],
+            cap_add=['NET_BIND_SERVICE'],
             environment={
                 key.upper(): value for key, value in challenge_entry.settings.items()
             },
