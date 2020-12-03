@@ -20,6 +20,7 @@ Hopefully reasonably complete instructions.
         * pyscopg2
 2. Run ``poetry config virtualenvs.create false``
 3. Add a user ``django``
+3. Make sure the `django` user can download your containers.
 4. Create a database for django
     1. ``sudo -u postgres createuser django``
     1. ``sudo -u postgres createdb -O django django``
