@@ -82,10 +82,18 @@
                 Running process
             </div>
             <div class="card-body">
-                Connect to this challenge on <code>{{ docker_host }}</code> on port {{ process.port.port }}, for example using the following commands:
-<pre>
-nc {{ docker_host }} {{ process.port.port }}
-</pre>
+                Connect to this challenge on <code>{{ docker_host }}</code> on one of the following ports:
+                <ul>
+                    {% for port in process.ports %}
+                        <li>{{port.port }} — {{ port.description }}</li>
+                    {% endfor %}
+                </ul>
+
+                For example using the following commands:
+                <pre>
+                    nc {{ docker_host }} PORT
+                </pre>
+
                 This instance has been running since {{ process.started }}.
                 {% buttons %}
                 <button type="submit" class="btn btn-danger" id="stop-process-{{ process.pk }}">

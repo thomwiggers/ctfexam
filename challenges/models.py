@@ -4,6 +4,7 @@ import random
 import secrets
 
 import docker
+from django import forms
 from django.dispatch import receiver
 from django.db import models, transaction
 from django.db.models import Q
@@ -11,6 +12,8 @@ from django.conf import settings as django_settings
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from django.core import validators
 from django.urls import reverse
 
 
@@ -19,12 +22,21 @@ logger = logging.getLogger(__name__)
 
 
 class AvailableChallengeManager(models.Manager):
+    """Available challenges"""
     def get_queryset(self):
         return (
             super()
             .get_queryset()
             .filter(start_time__lte=timezone.now(), end_time__gt=timezone.now())
         )
+
+def ports_default():
+    """Default ports"""
+    return [{
+        "port": 1337,
+        "description": "challenge port",
+        "logged": True,
+    }]
 
 
 class Challenge(models.Model):
@@ -46,6 +58,12 @@ class Challenge(models.Model):
     )
 
     end_time = models.DateTimeField("no longer available after")
+
+    listen_ports = models.JSONField(
+        _("Ports exposed by this container"),
+        help_text=_("Port, description and if it's logged"),
+        default=ports_default,
+    )
 
     @property
     def is_active(self):
@@ -113,33 +131,6 @@ class ChallengeEntry(models.Model):
         return f"{self.user} taking {self.challenge.title}"
 
 
-class AvailablePortsManager(models.Manager):
-    def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .filter(
-                Q(challengeprocess__running=True) | Q(challengeprocess__isnull=True)
-            )
-        )
-
-
-class Port(models.Model):
-    """Manages available ports"""
-
-    objects = models.Manager()
-    available_ports = AvailablePortsManager()
-
-    port = models.PositiveIntegerField(primary_key=True)
-
-    def __str__(self):
-        return f"Port {self.port}"
-
-    @classmethod
-    def get_new_port(cls):
-        return cls.available_ports.order_by("?").first()
-
-
 class ActiveChallengesManager(models.Manager):
     """Gets only active challenges"""
 
@@ -152,13 +143,32 @@ class ChallengeProcess(models.Model):
     """Manage a process started for a challenge"""
 
     objects = models.Manager()
+
     running_challenges = ActiveChallengesManager()
 
     challenge_entry = models.ForeignKey("ChallengeEntry", on_delete=models.CASCADE)
 
     running = models.BooleanField(default=False)
 
-    port = models.OneToOneField(Port, blank=True, null=True, on_delete=models.PROTECT)
+    @property
+    def ports(self):
+        """Get the remotely accessible port"""
+        if not self.running:
+            return []
+        client = docker.DockerClient.from_env()
+        external_ports = []
+        try:
+            listen_ports = self.challenge_entry.challenge.ports
+            for port_data in listen_ports:
+                port = port_data['port']
+                cont = client.containers.get(f"{self.process_identifier}_proxy_{port}")
+                external_ports.append({
+                    "port": cont.ports.get("4000/tcp", [{"HostPort": None}])[0]["HostPort"],
+                    "description": port_data['description'],
+                })
+        except docker.errors.NotFound:
+            self.stop()
+        return external_ports
 
     process_identifier = models.TextField()
 
@@ -173,8 +183,7 @@ class ChallengeProcess(models.Model):
             try:
                 client.containers.get(f"{dockerid}_vuln")
             except docker.errors.NotFound:
-                process.running = False
-                process.save()
+                process.stop(client)
 
     cleanup.alters_data = True
 
@@ -223,38 +232,38 @@ class ChallengeProcess(models.Model):
             },
         )
         with transaction.atomic():
-            port = Port.get_new_port()
-            proxy = client.containers.run(
-                django_settings.PROXY_CONTAINER,
-                name=f"{dockerid}_proxy",
-                detach=True,
-                auto_remove=True,
-                cpu_period=100000,
-                cpu_quota=10000,  # 10%
-                mem_limit="100m",
-                network=f"{dockerid}_public_network",
-                stop_signal="SIGKILL",
-                cap_add=["CHOWN"],
-                environment={"VULNHOST": "vulnhost", "VULNPORT": "1337",},
-                ports={"4000": port.port,},
-                volumes={str(logdir): {"bind": "/log/", "mode": "rw"},},
-            )
-            internal.connect(proxy)
-            internal.connect(vuln, aliases=["vulnhost"])
+            for port in challenge.ports:
+                proxy = client.containers.run(
+                    django_settings.PROXY_CONTAINER,
+                    name=f"{dockerid}_proxy_{port['port']}",
+                    detach=True,
+                    auto_remove=True,
+                    cpu_period=100000,
+                    cpu_quota=10000,  # 10%
+                    mem_limit="100m",
+                    network=f"{dockerid}_public_network",
+                    stop_signal="SIGKILL",
+                    cap_add=["CHOWN"],
+                    environment={"VULNHOST": "vulnhost", "VULNPORT": f"{port['port']}",},
+                    ports={"4000": None},
+                    volumes={str(logdir): {"bind": "/log/", "mode": "rw"},},
+                )
+                internal.connect(proxy)
+                internal.connect(vuln, aliases=["vulnhost"])
 
             cls.objects.create(
                 challenge_entry=challenge_entry,
                 process_identifier=dockerid,
-                port=port,
                 running=True,
             )
 
     start.alters_data = True
 
-    def stop(self):
+    def stop(self, client=None):
         """Stop the process"""
         logger.info("Stopping process for %s", self.challenge_entry.challenge.title)
-        client = docker.DockerClient.from_env()
+        if client is None:
+            client = docker.DockerClient.from_env()
         dockerid = self.process_identifier
 
         def stop_container(name):
@@ -271,8 +280,9 @@ class ChallengeProcess(models.Model):
             except docker.errors.NotFound:
                 pass
 
-        for name in ["vuln", "proxy"]:
-            stop_container(name)
+        stop_container("vuln")
+        for port in self.challenge_entry.challenge.ports:
+            stop_container(f"proxy_{port['port']}")
         for name in ["internal", "public"]:
             remove_network(name)
 
@@ -282,7 +292,7 @@ class ChallengeProcess(models.Model):
     stop.alters_data = True
 
     def __str__(self):
-        return f"Process for {self.challenge_entry} on port {self.port}"
+        return f"Process for {self.challenge_entry}"
 
 
 @receiver(
