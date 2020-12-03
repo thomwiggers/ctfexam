@@ -15,6 +15,10 @@ ALLOWED_HOSTS = [
 ]
 
 DJANGO_HOST = "hackme.rded.nl"
+DOCKER_HOST = "hackme.rded.nl"
+
+CONTAINER_NAMESPACE = "eu.gcr.io/hacking-in-c"
+PROXY_CONTAINER = f"{CONTAINER_NAMESPACE}/exam-proxy"
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
