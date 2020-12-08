@@ -170,8 +170,10 @@ class ChallengeProcess(models.Model):
             listen_ports = self.challenge_entry.challenge.listen_ports
             for port_data in listen_ports:
                 port = port_data["port"]
-                if port_data['logged']:
-                    cont = client.containers.get(f"{self.process_identifier}_proxy_{port}")
+                if port_data["logged"]:
+                    cont = client.containers.get(
+                        f"{self.process_identifier}_proxy_{port}"
+                    )
                     internal_port = "4000/tcp"
                 else:
                     cont = client.containers.get(f"{self.process_identifier}_vuln")
@@ -229,9 +231,7 @@ class ChallengeProcess(models.Model):
         )
         client.networks.create(f"{dockerid}_public_network",)
         public_ports = {
-            port['port']: None
-            for port in challenge.listen_ports
-            if not port['logged']
+            port["port"]: None for port in challenge.listen_ports if not port["logged"]
         }
         vuln = client.containers.run(
             challenge_container,
@@ -248,14 +248,14 @@ class ChallengeProcess(models.Model):
             privileged=challenge.privileged,
             ports=public_ports,
             cap_drop=["ALL"],
-            cap_add=['NET_BIND_SERVICE'],
+            cap_add=["NET_BIND_SERVICE", "CHOWN", "SETUID", "SETGID"],
             environment={
                 key.upper(): value for key, value in challenge_entry.settings.items()
             },
         )
         with transaction.atomic():
             for port in challenge.listen_ports:
-                if not port['logged']:
+                if not port["logged"]:
                     continue
                 proxy = client.containers.run(
                     django_settings.PROXY_CONTAINER,
