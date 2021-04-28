@@ -16,16 +16,16 @@ Hopefully reasonably complete instructions.
         * nginx
         * certbot
         * postgresql
-        * uwsgi
-        * pyscopg2
+        * uwsgi  (if using `apt`, install `uwsgi-plugin-python3`)
+        * psycopg2
 2. Run ``poetry config virtualenvs.create false``
 3. Add a user ``django``
 3. Make sure the `django` user can download your containers.
-4. Create a database for django
+4. Create a database for django (errors about changing directory may be ignored)
     1. ``sudo -u postgres createuser django``
     1. ``sudo -u postgres createdb -O django django``
 5. Set up SSL through certbot
-6. Put the nginx config from resources in the right place
+6. Put the nginx config from `resources` in the right place
 7. Clone this repo into the `/home/django/ctfexam` folder
 8. ``poetry install`` as root
 8. Copy ``resources/uwsgi/django.ini`` to ``/home/django``

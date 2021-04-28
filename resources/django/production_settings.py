@@ -27,7 +27,7 @@ ADMINS = [("Name", "Email")]
 
 assert "SECRET_KEY" in os.environ
 
-from students import VALID_STUDENT_NUMBERS
+from .students import VALID_STUDENT_NUMBERS
 
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 
