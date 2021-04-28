@@ -6,10 +6,11 @@ from django.conf import settings
 def index(request: HttpRequest) -> HttpResponse:
     """Render the index"""
 
-    return render(request, "ctf/index.html", {
-        "disclaimer": settings.SHOW_DISCLAIMER,
-        "example": settings.SHOW_EXAMPLE
-    })
+    return render(
+        request,
+        "ctf/index.html",
+        {"disclaimer": settings.SHOW_DISCLAIMER, "example": settings.SHOW_EXAMPLE},
+    )
 
 
 def faq(request: HttpRequest) -> HttpResponse:

@@ -248,7 +248,15 @@ class ChallengeProcess(models.Model):
             privileged=challenge.privileged,
             ports=public_ports,
             cap_drop=["ALL"],
-            cap_add=["NET_BIND_SERVICE", "CHOWN", "SETUID", "SETGID", "SYS_CHROOT", "AUDIT_WRITE", "DAC_OVERRIDE"],
+            cap_add=[
+                "NET_BIND_SERVICE",
+                "CHOWN",
+                "SETUID",
+                "SETGID",
+                "SYS_CHROOT",
+                "AUDIT_WRITE",
+                "DAC_OVERRIDE",
+            ],
             environment={
                 key.upper(): value for key, value in challenge_entry.settings.items()
             },
