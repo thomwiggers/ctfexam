@@ -8,7 +8,7 @@
     {% for challenge in challenges %}
       <div class="row">
         <div class="card w-100 mb-4">
-          <div class="card-header text-white {% if not challenge.obj.active %}bg-warning{% elif challenge.finished %}bg-secondary{% else %}bg-primary{% endif %}">
+          <div class="card-header text-white {% if not challenge.obj.is_active %}bg-warning{% elif challenge.finished %}bg-secondary{% else %}bg-primary{% endif %}">
             {{ challenge.obj.title }} {% if challenge.finished %}(Completed at {{ challenge.user_entry.completion_time|date:"DATETIME_FORMAT" }}){% endif %}
           </div>
           <div class="card-body">
