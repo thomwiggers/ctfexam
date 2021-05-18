@@ -47,10 +47,14 @@ class ChallengeListView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         """Get the data necessary for the view"""
+        if self.request.user.is_superuser:
+            challenges = models.Challenge.objects.all()
+        else:
+            challenges = models.Challenge.available.all()
         context = super().get_context_data(*args, **kwargs)
         context["challenges"] = [
             self._format_challenge(challenge)
-            for challenge in models.Challenge.available.all()
+            for challenge in challenges
         ]
 
         return context
@@ -59,6 +63,8 @@ class ChallengeListView(TemplateView):
 class ChallengeDetailView(LoginRequiredMixin, DetailView):
     def get_queryset(self):
         # Needs to be active because otherwise we copy the old date
+        if self.request.user.is_superuser:
+            return models.Challenge.objects.all()
         return models.Challenge.available.all()
 
     def get_context_data(self, *args, **kwargs):
