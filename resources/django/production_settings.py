@@ -42,7 +42,10 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 DATABASES = {
-    "default": {"ENGINE": "django.db.backends.postgresql", "NAME": "django",},
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "django",
+    },
 }
 
 if "SENTRY_DSN" in os.environ:

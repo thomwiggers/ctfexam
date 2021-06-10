@@ -17,7 +17,10 @@ from . import models
 
 def markdownize(text):
     if text is not None:
-        return markdown.markdown(text, extensions=["extra", "smarty", "codehilite"],)
+        return markdown.markdown(
+            text,
+            extensions=["extra", "smarty", "codehilite"],
+        )
     return ""
 
 
@@ -53,8 +56,7 @@ class ChallengeListView(TemplateView):
             challenges = models.Challenge.available.all()
         context = super().get_context_data(*args, **kwargs)
         context["challenges"] = [
-            self._format_challenge(challenge)
-            for challenge in challenges
+            self._format_challenge(challenge) for challenge in challenges
         ]
 
         return context
@@ -88,7 +90,8 @@ class SubmitFlag(LoginRequiredMixin, View):
         if not challenge.is_active and not request.user.is_superuser:
             raise Http404
         entry, _new = models.ChallengeEntry.objects.get_or_create(
-            challenge=challenge, user=request.user,
+            challenge=challenge,
+            user=request.user,
         )
         flag = request.POST.get("flag")
         return JsonResponse({"correct": entry.submit_flag(flag)})
@@ -100,7 +103,8 @@ class SubmitWriteup(LoginRequiredMixin, View):
         if not challenge.is_active and not request.user.is_superuser:
             raise Http404
         entry, _new = models.ChallengeEntry.objects.get_or_create(
-            challenge=challenge, user=request.user,
+            challenge=challenge,
+            user=request.user,
         )
         writeup = request.POST.get("writeup")
         if writeup is None:
@@ -123,7 +127,8 @@ class ChallengeProcessCreateView(LoginRequiredMixin, View):
         if not challenge.is_active and not request.user.is_superuser:
             raise Http404
         entry, _new = models.ChallengeEntry.objects.get_or_create(
-            challenge=challenge, user=request.user,
+            challenge=challenge,
+            user=request.user,
         )
         models.ChallengeProcess.start(entry)
         return JsonResponse({"started": True})

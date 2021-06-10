@@ -26,7 +26,9 @@ class User(AbstractUser):
         blank=False,
         null=False,
         unique=True,
-        validators=[validate_student_number,],
+        validators=[
+            validate_student_number,
+        ],
     )
 
     def save(self, *args, **kwargs):

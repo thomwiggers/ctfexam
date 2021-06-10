@@ -34,7 +34,13 @@ class AvailableChallengeManager(models.Manager):
 
 def ports_default():
     """Default ports"""
-    return [{"port": 1337, "description": "challenge port", "logged": True,}]
+    return [
+        {
+            "port": 1337,
+            "description": "challenge port",
+            "logged": True,
+        }
+    ]
 
 
 class Challenge(models.Model):
@@ -227,9 +233,12 @@ class ChallengeProcess(models.Model):
         )
         client.images.pull(challenge_container, tag="latest")
         internal = client.networks.create(
-            f"{dockerid}_internal_network", internal=True,
+            f"{dockerid}_internal_network",
+            internal=True,
         )
-        client.networks.create(f"{dockerid}_public_network",)
+        client.networks.create(
+            f"{dockerid}_public_network",
+        )
         public_ports = {
             port["port"]: None for port in challenge.listen_ports if not port["logged"]
         }
@@ -281,7 +290,9 @@ class ChallengeProcess(models.Model):
                         "VULNPORT": f"{port['port']}",
                     },
                     ports={"4000": None},
-                    volumes={str(logdir): {"bind": "/log/", "mode": "rw"},},
+                    volumes={
+                        str(logdir): {"bind": "/log/", "mode": "rw"},
+                    },
                 )
                 internal.connect(proxy)
 

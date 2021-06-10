@@ -6,9 +6,18 @@ from typing import List, Dict
 
 
 MAIN_MENU: List[Dict[str, str]] = [
-    {"title": "Home", "name": "index",},
-    {"title": "Challenges", "name": "challenges:challenges",},
-    {"title": "FAQ", "name": "faq",},
+    {
+        "title": "Home",
+        "name": "index",
+    },
+    {
+        "title": "Challenges",
+        "name": "challenges:challenges",
+    },
+    {
+        "title": "FAQ",
+        "name": "faq",
+    },
 ]
 
 register = template.Library()
