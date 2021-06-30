@@ -36,8 +36,9 @@ class ChallengeAdmin(admin.ModelAdmin):
 
 @admin.register(models.ChallengeEntry)
 class ChallengeEntryAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "completion_time")
+    list_display = ("__str__", "user", "completion_time")
     list_filter = ("challenge__title",)
+    search_fields = ("user__username", "user__first_name", "user__last_name")
 
 
 @admin.register(models.ChallengeProcess)
