@@ -8,9 +8,9 @@ use std::sync::{Arc, Mutex};
 
 use chrono::prelude::*;
 use clap::{crate_authors, crate_version, Arg};
-use hex;
+
 use log::{info, trace, warn};
-use env_logger;
+
 
 const PROGRAM_NAME: &str = "examproxy";
 const PROGRAM_DESC: &str = "Proxies a vulnerable application and logs the data sent to it.";
@@ -60,7 +60,7 @@ fn main() -> io::Result<()> {
 }
 
 fn start_child<S: AsRef<OsStr>>(program: &[S]) -> io::Result<Child> {
-    assert!(program.len() >= 1);
+    assert!(!program.is_empty());
     let filtered_env: HashMap<String, String> = std::env::vars()
         .filter(|&(ref k, _)| k == "TERM" || k == "LANG" || k == "PATH" || k.starts_with("LC_"))
         .collect();
@@ -76,13 +76,13 @@ fn start_child<S: AsRef<OsStr>>(program: &[S]) -> io::Result<Child> {
 
 fn write_line(buffer: &mut impl io::Write, direction: &str, bytes: &[u8]) -> io::Result<()> {
     match std::str::from_utf8(bytes) {
-        Ok(nice_str) => write!(
+        Ok(nice_str) => writeln!(
             buffer,
-            "{} \"{}\"\n",
+            "{} \"{}\"",
             direction,
             nice_str.trim_end_matches('\n')
         ),
-        Err(_) => write!(buffer, "{} 0x{}\n", direction, hex::encode(bytes)),
+        Err(_) => writeln!(buffer, "{} 0x{}", direction, hex::encode(bytes)),
     }
 }
 
@@ -98,22 +98,19 @@ fn read_loop(program: &[&OsStr], log_file: File) -> io::Result<()> {
     let stdout = child.stdout.take().unwrap();
     let mut proxy_stdout = std::io::stdout();
     let log_handle = log_file.clone();
-    let read_thread = std::thread::spawn(move || {
+    let _read_thread = std::thread::spawn(move || {
         let mut output_buffer = Vec::new();
         for byte in stdout.bytes() {
             let byte = byte.unwrap();
             output_buffer.push(byte);
-            if byte == '\n' as u8 {
+            if byte == b'\n' {
                 let mut log = log_handle.lock().unwrap();
                 write_line(&mut *log, "<-", &output_buffer).unwrap();
                 output_buffer.clear();
             }
-            match proxy_stdout.write(&[byte]) {
-                Err(e) => {
+            if let Err(e) = proxy_stdout.write(&[byte]) {
                     warn!("Error while writing output to student: {}", e);
                     break;
-                }
-                _ => (),
             };
             proxy_stdout.flush().unwrap();
         }
@@ -126,7 +123,7 @@ fn read_loop(program: &[&OsStr], log_file: File) -> io::Result<()> {
         trace!("Stdout of child closed");
     });
     let log_handle = log_file.clone();
-    let write_thread = std::thread::spawn(move || {
+    let _write_thread = std::thread::spawn(move || {
         let stdin = std::io::stdin();
         let in_handle = stdin.lock();
         let mut log_buffer = Vec::new();
@@ -139,17 +136,14 @@ fn read_loop(program: &[&OsStr], log_file: File) -> io::Result<()> {
             }
             let byte = byte.unwrap();
             log_buffer.push(byte);
-            if byte == '\n' as u8 {
+            if byte == b'\n' {
                 let mut log = log_handle.lock().unwrap();
                 write_line(&mut *log, "->", &log_buffer).unwrap();
                 log_buffer.clear();
             }
-            match child_stdin.write(&[byte]) {
-                Err(e) => {
-                    warn!("Error while writing to stdin: {}", e);
-                    break;
-                }
-                _ => (),
+            if let Err(e) = child_stdin.write(&[byte]) {
+                warn!("Error while writing to stdin: {}", e);
+                break;
             };
             child_stdin.flush().unwrap();
         }
@@ -164,7 +158,7 @@ fn read_loop(program: &[&OsStr], log_file: File) -> io::Result<()> {
 
     trace!("Waiting for child to terminate");
     let status = child.wait()?;
-    let log_handle = log_file.clone();
+    let log_handle = log_file;
     let mut log = log_handle.lock().unwrap();
     writeln!(&mut *log, "** Terminated with status {}", status)?;
     trace!("Child terminated with status {}", status);
