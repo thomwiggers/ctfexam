@@ -7,7 +7,7 @@ use std::process::{Child, Command, Stdio};
 use std::sync::{Arc, Mutex};
 
 use chrono::prelude::*;
-use clap::{crate_authors, crate_version, Arg, crate_description};
+use clap::{crate_authors, crate_description, crate_version, Arg};
 
 use log::{info, trace, warn};
 
