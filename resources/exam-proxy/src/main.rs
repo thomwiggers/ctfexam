@@ -7,7 +7,7 @@ use std::process::{Child, Command, Stdio};
 use std::sync::{Arc, Mutex};
 
 use chrono::prelude::*;
-use clap::{crate_authors, crate_version, App, Arg};
+use clap::{crate_authors, crate_version, Arg};
 use hex;
 use log::{info, trace, warn};
 use env_logger;
@@ -24,13 +24,13 @@ fn main() -> io::Result<()> {
     })
     .unwrap();
 
-    let matches = App::new(PROGRAM_NAME)
+    let matches = clap::Command::new(PROGRAM_NAME)
         .version(crate_version!())
         .author(crate_authors!())
         .about(PROGRAM_DESC)
         .arg(
-            Arg::with_name("output")
-                .short("o")
+            Arg::new("output")
+                .short('o')
                 .long("output")
                 .value_name("FILE")
                 .help("Log to this file")
@@ -38,8 +38,8 @@ fn main() -> io::Result<()> {
                 .takes_value(true),
         )
         .arg(
-            Arg::with_name("program")
-                .multiple(true)
+            Arg::new("program")
+                .multiple_occurrences(true)
                 .last(true)
                 .required(true),
         )
@@ -62,7 +62,7 @@ fn main() -> io::Result<()> {
 fn start_child<S: AsRef<OsStr>>(program: &[S]) -> io::Result<Child> {
     assert!(program.len() >= 1);
     let filtered_env: HashMap<String, String> = std::env::vars()
-        .filter(|&(ref k, _)| k == "TERM" || k == "LANG" || k == "PATH")
+        .filter(|&(ref k, _)| k == "TERM" || k == "LANG" || k == "PATH" || k.starts_with("LC_"))
         .collect();
     Command::new(&program[0])
         .args(&program[1..])
