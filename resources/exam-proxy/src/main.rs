@@ -7,13 +7,11 @@ use std::process::{Child, Command, Stdio};
 use std::sync::{Arc, Mutex};
 
 use chrono::prelude::*;
-use clap::{crate_authors, crate_version, Arg};
+use clap::{crate_authors, crate_version, Arg, crate_description};
 
 use log::{info, trace, warn};
 
-
 const PROGRAM_NAME: &str = "examproxy";
-const PROGRAM_DESC: &str = "Proxies a vulnerable application and logs the data sent to it.";
 
 fn main() -> io::Result<()> {
     env_logger::init();
@@ -27,7 +25,7 @@ fn main() -> io::Result<()> {
     let matches = clap::Command::new(PROGRAM_NAME)
         .version(crate_version!())
         .author(crate_authors!())
-        .about(PROGRAM_DESC)
+        .about(crate_description!())
         .arg(
             Arg::new("output")
                 .short('o')
@@ -46,7 +44,11 @@ fn main() -> io::Result<()> {
         .get_matches();
 
     let output_file_name = matches.value_of("output").unwrap();
-    let program = matches.values_of_os("program").unwrap().collect::<Vec<_>>();
+    let program = matches
+        .values_of("program")
+        .unwrap()
+        .map(OsStr::new)
+        .collect::<Vec<_>>();
     trace!("Writing to {}", output_file_name);
 
     let out_file = OpenOptions::new()
@@ -109,8 +111,8 @@ fn read_loop(program: &[&OsStr], log_file: File) -> io::Result<()> {
                 output_buffer.clear();
             }
             if let Err(e) = proxy_stdout.write(&[byte]) {
-                    warn!("Error while writing output to student: {}", e);
-                    break;
+                warn!("Error while writing output to student: {}", e);
+                break;
             };
             proxy_stdout.flush().unwrap();
         }

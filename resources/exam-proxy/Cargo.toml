@@ -1,8 +1,9 @@
 [package]
 name = "exam-proxy"
-version = "0.1.0"
+description = "Proxies a vulnerable application and logs the data sent to it."
+version = "0.2.0"
 authors = ["Thom Wiggers <thom@thomwiggers.nl>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
