@@ -250,10 +250,11 @@ class ChallengeProcess(models.Model):
             cpu_period=100000,
             cpu_quota=5000,  # 5%
             mem_limit="150m",
-            network_mode=None,
+            network_mode="none",
             hostname="vulnhost",
             stop_signal="SIGKILL",
             pids_limit=100,
+            security_opt=["no-new-privileges:true"],
             privileged=challenge.privileged,
             ports=public_ports,
             cap_drop=["ALL"],
@@ -266,6 +267,8 @@ class ChallengeProcess(models.Model):
                 "AUDIT_WRITE",
                 "DAC_OVERRIDE",
             ],
+            ipc_mode="none",
+            restart_policy={"Name": "always", "MaximumRetryCount": 5},
             environment={
                 key.upper(): value for key, value in challenge_entry.settings.items()
             },
@@ -284,6 +287,7 @@ class ChallengeProcess(models.Model):
                     mem_limit="100m",
                     network=f"{dockerid}_public_network",
                     stop_signal="SIGKILL",
+                    security_opt=["no-new-privileges:true"],
                     cap_add=["CHOWN"],
                     environment={
                         "VULNHOST": "vulnhost",
