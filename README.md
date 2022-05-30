@@ -11,8 +11,8 @@ Hopefully reasonably complete instructions.
     1. Push your other containers
 2. Set up a nice VM somewhere
     1. Install:
-        * poetry
-        * Docker
+        * poetry (probably via pip3 or docs if your distro doesn't package it)
+        * Docker (via Docker documentation instructions if your distro doesn't package a recent version)
         * nginx
         * certbot
         * postgresql
@@ -21,12 +21,16 @@ Hopefully reasonably complete instructions.
     2. Disable ASLR
         * `kernel.randomize_va_space = 0` in `/etc/sysctl.conf` or your favourite method.
 2. Run ``poetry config virtualenvs.create false`` as root
-3. Add a user ``django``
+3. Add a user ``django``  (``useradd -m django``)
 3. Make sure the `django` user can download your containers.
+    * Add to ``docker`` group (``gpasswd -a docker django``)
+    * For Google Artifact Registry, e.g. run ``gcloud auth configure-docker europe-west4-docker.pkg.dev`` to set up the pulling.
+      Google Compute Engine VMs should have access (or you may have to set it up in IAM)
 4. Create a database for django (errors about changing directory may be ignored)
     1. ``sudo -u postgres createuser django``
     1. ``sudo -u postgres createdb -O django django``
-5. Set up SSL through certbot
+5. Set up TLS through certbot via your favourite method.
+   * You may need to mess with NGINX to do validation, or use DNS validation with something like the Cloudflare-dns plugin.
 6. Put the nginx config from `resources` in the right place
 7. Clone this repo into the `/home/django/ctfexam` folder
 8. ``poetry install --no-dev`` as root
