@@ -33,10 +33,12 @@ Hopefully reasonably complete instructions.
 9. Copy ``resources/uwsgi/django.ini`` to ``/home/django``
 10. Set your environment variables in ``/home/django/django.ini``
 11. Copy ``production_settings.py`` and ``students.py`` to ``ctfexam/ctfexam``
+    * These settings suggest using [Sentry](https://sentry.io) for debug/error logging and alerting, free tier is available (Github Pack upgrade exists as well).
+    * The SMTP settings (password resets!) suggest using [Sendgrid](https://sendgrid.net); you might also consider setting up a temporary Gmail account with SMTP.
 12. Set the settings and ``students.py`` according to your preferences.
 13. Set up the docker config from ``resources/docker`` by copying it to ``/etc/docker``
 14. Copy the systemd files to `/etc/systemd/system`
 15. Enable the systemd units
 16. ``SECRET_KEY=foo ./manage.py migrate``  (actual value of `SECRET_KEY` does not matter for any of these)
-17. ``SECRET_KEY=foo ./manage.py createsuperuser`` 
+17. ``SECRET_KEY=foo ./manage.py createsuperuser``
 18. ``SECRET_KEY=foo ./manage.py collectstatic``
