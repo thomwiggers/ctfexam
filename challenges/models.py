@@ -268,7 +268,7 @@ class ChallengeProcess(models.Model):
                 "DAC_OVERRIDE",
             ],
             ipc_mode="none",
-            restart_policy={"Name": "always", "MaximumRetryCount": 5},
+            restart_policy={"Name": "on-failure", "MaximumRetryCount": 5},
             environment={
                 key.upper(): value for key, value in challenge_entry.settings.items()
             },
