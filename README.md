@@ -31,18 +31,24 @@ Hopefully reasonably complete instructions.
     1. ``sudo -u postgres createdb -O django django``
 5. Set up TLS through certbot via your favourite method.
    * You may need to mess with NGINX to do validation, or use DNS validation with something like the Cloudflare-dns plugin.
-6. Put the nginx config from `resources` in the right place
-7. Clone this repo into the `/home/django/ctfexam` folder
-8. ``poetry install --no-dev`` as root
+6. Clone this repo into the `/home/django/ctfexam` folder
+7. Put the nginx config from `resources` in the right place
+    * on Debian-y hosts `/etc/nginx/sites-enabled/` is the place to go
+    * You may need to get rid of `/etc/nginx/sites-enabled/default`.
+    * You will need the TLS certs; use `sudo nginx -t` for troubleshooting.
+8. ``poetry install --no-dev`` as root in `/home/django/ctfexam`
 9. Copy ``resources/uwsgi/django.ini`` to ``/home/django``
-10. Set your environment variables in ``/home/django/django.ini``
-11. Copy ``production_settings.py`` and ``students.py`` to ``ctfexam/ctfexam``
+10. Fill in your environment variables in ``/home/django/django.ini`` at the bottom
+    * `SECRET_KEY` should be a decently random, long-enough string.
+    * `SENTRY_DSN` is related to what's mentioned below. If you comment it out, Sentry isn't used.
+11. From `resources/django`, copy ``production_settings.py`` and ``students.py`` to ``ctfexam/ctfexam``
     * These settings suggest using [Sentry](https://sentry.io) for debug/error logging and alerting, free tier is available (Github Pack upgrade exists as well).
     * The SMTP settings (password resets!) suggest using [Sendgrid](https://sendgrid.net); you might also consider setting up a temporary Gmail account with SMTP.
 12. Set the settings and ``students.py`` according to your preferences.
-13. Set up the docker config from ``resources/docker`` by copying it to ``/etc/docker``
-14. Copy the systemd files to `/etc/systemd/system`
+13. Set up the docker config from ``resources/docker`` by copying it to ``/etc/docker``.
+    * Restart Docker by running `systemctl restart docker`.
+14. Copy the systemd files from `resources/systemd` to `/etc/systemd/system`
 15. Enable the systemd units
-16. ``SECRET_KEY=foo ./manage.py migrate``  (actual value of `SECRET_KEY` does not matter for any of these)
+16. Run this as user django: ``SECRET_KEY=foo ./manage.py migrate``  (actual value of `SECRET_KEY` does not matter for any of these)
 17. ``SECRET_KEY=foo ./manage.py createsuperuser``
 18. ``SECRET_KEY=foo ./manage.py collectstatic``
