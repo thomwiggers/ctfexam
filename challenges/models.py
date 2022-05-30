@@ -250,7 +250,7 @@ class ChallengeProcess(models.Model):
             cpu_period=100000,
             cpu_quota=5000,  # 5%
             mem_limit="150m",
-            network_mode="none",
+            network_mode=None,
             hostname="vulnhost",
             stop_signal="SIGKILL",
             pids_limit=100,
