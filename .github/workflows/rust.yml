@@ -7,6 +7,7 @@ jobs:
   build_and_test:
     name: Build exam-proxy
     runs-on: ubuntu-latest
+    working-directory: resources/exam-proxy
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
