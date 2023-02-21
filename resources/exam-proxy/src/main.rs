@@ -7,7 +7,7 @@ use std::process::{Child, Command, Stdio};
 use std::sync::{Arc, Mutex};
 
 use chrono::prelude::*;
-use clap::{crate_authors, crate_description, crate_version, Arg};
+use clap::{crate_authors, crate_description, crate_version, Arg, ArgAction};
 
 use log::{info, trace, warn};
 
@@ -33,19 +33,19 @@ fn main() -> io::Result<()> {
                 .value_name("FILE")
                 .help("Log to this file")
                 .required(true)
-                .takes_value(true),
+                .action(ArgAction::Set),
         )
         .arg(
             Arg::new("program")
-                .multiple_occurrences(true)
                 .last(true)
-                .required(true),
+                .required(true)
+                .action(ArgAction::Append),
         )
         .get_matches();
 
-    let output_file_name = matches.value_of("output").unwrap();
+    let output_file_name = matches.get_one::<String>("output").unwrap();
     let program = matches
-        .values_of("program")
+        .get_many::<String>("program")
         .unwrap()
         .map(OsStr::new)
         .collect::<Vec<_>>();
