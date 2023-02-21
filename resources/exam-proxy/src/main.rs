@@ -64,7 +64,7 @@ fn main() -> io::Result<()> {
 fn start_child<S: AsRef<OsStr>>(program: &[S]) -> io::Result<Child> {
     assert!(!program.is_empty());
     let filtered_env: HashMap<String, String> = std::env::vars()
-        .filter(|&(ref k, _)| k == "TERM" || k == "LANG" || k == "PATH" || k.starts_with("LC_"))
+        .filter(|(k, _)| k == "TERM" || k == "LANG" || k == "PATH" || k.starts_with("LC_"))
         .collect();
     Command::new(&program[0])
         .args(&program[1..])
@@ -162,7 +162,7 @@ fn read_loop(program: &[&OsStr], log_file: File) -> io::Result<()> {
     let status = child.wait()?;
     let log_handle = log_file;
     let mut log = log_handle.lock().unwrap();
-    writeln!(&mut *log, "** Terminated with status {}", status)?;
+    writeln!(&mut *log, "** Terminated with status {status}")?;
     trace!("Child terminated with status {}", status);
     //read_thread
     //    .join()
