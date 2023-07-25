@@ -11,11 +11,13 @@ updates:
     interval: monthly
   groups:
     python-packages:
-      - "*"
+      patterns:
+        - "*"
 - package-ecosystem: cargo
   directory: "/resources/exam-proxy"
   schedule:
     interval: monthly
   groups:
     rust-packages:
-      - "*"
+      patterns:
+        - "*"
