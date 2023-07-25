@@ -9,7 +9,13 @@ updates:
   directory: "/"
   schedule:
     interval: monthly
+  groups:
+    python-packages:
+      - "*"
 - package-ecosystem: cargo
   directory: "/resources/exam-proxy"
   schedule:
     interval: monthly
+  groups:
+    rust-packages:
+      - "*"
