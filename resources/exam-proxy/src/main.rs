@@ -6,7 +6,6 @@ use std::io::prelude::*;
 use std::process::{Child, Command, Stdio};
 use std::sync::{Arc, Mutex};
 
-use chrono::prelude::*;
 use clap::{crate_authors, crate_description, crate_version, Arg, ArgAction};
 
 use log::{info, trace, warn};
@@ -89,7 +88,10 @@ fn write_line(buffer: &mut impl io::Write, direction: &str, bytes: &[u8]) -> io:
 }
 
 fn get_time() -> String {
-    Local::now().to_rfc2822()
+    time::OffsetDateTime::now_local()
+        .expect("Could not get time")
+        .format(&time::format_description::well_known::Rfc3339)
+        .expect("Formatting failed")
 }
 
 fn read_loop(program: &[&OsStr], log_file: File) -> io::Result<()> {
