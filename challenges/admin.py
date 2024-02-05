@@ -1,4 +1,5 @@
 """Registers models with the admin site"""
+
 from django.contrib import admin
 from django.utils import timezone
 

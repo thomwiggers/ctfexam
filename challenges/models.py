@@ -1,4 +1,5 @@
 """Models for the challenges"""
+
 import logging
 import random
 import secrets
