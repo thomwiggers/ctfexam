@@ -2,7 +2,9 @@
 
 import logging
 import random
+import re
 import secrets
+from typing import Optional
 
 import docker
 from django import forms
@@ -87,10 +89,10 @@ class Challenge(models.Model):
         """Return all completed entries of this challenge"""
         return self.challengeentry_set.filter(completion_time__isnull=False)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse("challenges:challenge", kwargs={"pk": self.pk})
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
 
@@ -126,12 +128,13 @@ class ChallengeEntry(models.Model):
     writeup = models.TextField(blank=True, null=True)
 
     @property
-    def flag(self):
+    def flag(self) -> str:
         return self.settings.get("flag", get_random_string(length=64))
 
-    def submit_flag(self, flag):
-        if flag is None or not flag.isascii():
+    def submit_flag(self, flag: Optional[str]) -> bool:
+        if flag is None:
             return False
+        flag = re.sub(r"[^a-zA-Z0-9{}]", "", flag)
         if secrets.compare_digest(self.flag, flag):
             self.completion_time = timezone.now()
             self.save()
