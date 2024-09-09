@@ -10,7 +10,7 @@ edition = "2021"
 [dependencies]
 clap = {version = "4", features = ["cargo"]}
 log = { version = "0.4", features = ["std"] }
-env_logger = "0.10"
+env_logger = "0.11"
 ctrlc = { version = "3.4", features = ["termination"] }
 hex = "0.4"
 time = { version = "0.3", features = ["formatting", "local-offset"] }
