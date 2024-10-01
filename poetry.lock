@@ -221,13 +221,13 @@ files = [
 
 [[package]]
 name = "django"
-version = "4.2.15"
+version = "4.2.16"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Django-4.2.15-py3-none-any.whl", hash = "sha256:61ee4a130efb8c451ef3467c67ca99fdce400fedd768634efc86a68c18d80d30"},
-    {file = "Django-4.2.15.tar.gz", hash = "sha256:c77f926b81129493961e19c0e02188f8d07c112a1162df69bfab178ae447f94a"},
+    {file = "Django-4.2.16-py3-none-any.whl", hash = "sha256:1ddc333a16fc139fd253035a1606bb24261951bbc3a6ca256717fa06cc41a898"},
+    {file = "Django-4.2.16.tar.gz", hash = "sha256:6f1616c2786c408ce86ab7e10f792b8f15742f7b7b7460243929cb371e7f1dad"},
 ]
 
 [package.dependencies]
@@ -241,18 +241,18 @@ bcrypt = ["bcrypt"]
 
 [[package]]
 name = "django-bootstrap4"
-version = "24.3"
-description = "Django extensions by Zostera"
+version = "24.4"
+description = "Bootstrap 4 for Django"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "django_bootstrap4-24.3-py3-none-any.whl", hash = "sha256:b555d87740a571036f100ad6026b1f62aabcb913404fb7f08f521881019b14bc"},
-    {file = "django_bootstrap4-24.3.tar.gz", hash = "sha256:819bc0ba7b25fcdeb12eb04353962436dbe95b228ba4cf4b49f5d3fee53692e1"},
+    {file = "django_bootstrap4-24.4-py3-none-any.whl", hash = "sha256:90f642d8c9a6622694544a4fdbf8e6734a037b33b5d6b2884cfd79c87c5d610f"},
+    {file = "django_bootstrap4-24.4.tar.gz", hash = "sha256:b6147eeaa534057f866962d50bcf506b3d378720340d7a8243494a6e33f4e23e"},
 ]
 
 [package.dependencies]
-beautifulsoup4 = ">=4.8.0"
-Django = ">=4.1"
+beautifulsoup4 = ">=4.10.0"
+Django = ">=4.2"
 
 [[package]]
 name = "django-template-check"
@@ -446,13 +446,13 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "sentry-sdk"
-version = "2.13.0"
+version = "2.14.0"
 description = "Python client for Sentry (https://sentry.io)"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "sentry_sdk-2.13.0-py2.py3-none-any.whl", hash = "sha256:6beede8fc2ab4043da7f69d95534e320944690680dd9a963178a49de71d726c6"},
-    {file = "sentry_sdk-2.13.0.tar.gz", hash = "sha256:8d4a576f7a98eb2fdb40e13106e41f330e5c79d72a68be1316e7852cf4995260"},
+    {file = "sentry_sdk-2.14.0-py2.py3-none-any.whl", hash = "sha256:b8bc3dc51d06590df1291b7519b85c75e2ced4f28d9ea655b6d54033503b5bf4"},
+    {file = "sentry_sdk-2.14.0.tar.gz", hash = "sha256:1e0e2eaf6dad918c7d1e0edac868a7bf20017b177f242cefe2a6bcd47955961d"},
 ]
 
 [package.dependencies]
